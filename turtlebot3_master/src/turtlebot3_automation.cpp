@@ -16,9 +16,9 @@
 
 /* Authors: Taehun Lim (Darby) */
 
-#include "turtlebot3_gazebo/turtlebot3_drive.h"
+#include "turtlebot3_master/turtlebot3_automation.h"
 
-Turtlebot3Drive::Turtlebot3Drive()
+Turtlebot3Automation::Turtlebot3Automation()
   : nh_priv_("~")
 {
   //Init gazebo ros turtlebot3 node
@@ -27,7 +27,7 @@ Turtlebot3Drive::Turtlebot3Drive()
   ROS_ASSERT(ret);
 }
 
-Turtlebot3Drive::~Turtlebot3Drive()
+Turtlebot3Automation::~Turtlebot3Automation()
 {
   updatecommandVelocity(0.0, 0.0);
   ros::shutdown();
@@ -36,15 +36,15 @@ Turtlebot3Drive::~Turtlebot3Drive()
 /*******************************************************************************
 * Init function
 *******************************************************************************/
-bool Turtlebot3Drive::init()
+bool Turtlebot3Automation::init()
 {
   // initialize ROS parameter
   std::string cmd_vel_topic_name = nh_.param<std::string>("cmd_vel_topic_name", "");
 
   // initialize variables
   escape_range_       = 30.0 * DEG2RAD;
-  check_forward_dist_ = 0.7;
-  check_side_dist_    = 0.6;
+  check_forward_dist_ = 0.7; //orig 0.7
+  check_side_dist_    = 0.6; // orig 0.6
 
   tb3_pose_ = 0.0;
   prev_tb3_pose_ = 0.0;
@@ -53,13 +53,13 @@ bool Turtlebot3Drive::init()
   cmd_vel_pub_   = nh_.advertise<geometry_msgs::Twist>(cmd_vel_topic_name, 10);
 
   // initialize subscribers
-  laser_scan_sub_  = nh_.subscribe("scan", 10, &Turtlebot3Drive::laserScanMsgCallBack, this);
-  odom_sub_ = nh_.subscribe("odom", 10, &Turtlebot3Drive::odomMsgCallBack, this);
+  laser_scan_sub_  = nh_.subscribe("scan", 10, &Turtlebot3Automation::laserScanMsgCallBack, this);
+  odom_sub_ = nh_.subscribe("odom", 10, &Turtlebot3Automation::odomMsgCallBack, this);
 
   return true;
 }
 
-void Turtlebot3Drive::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
+void Turtlebot3Automation::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
 {
   double siny = 2.0 * (msg->pose.pose.orientation.w * msg->pose.pose.orientation.z + msg->pose.pose.orientation.x * msg->pose.pose.orientation.y);
 	double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
@@ -67,7 +67,7 @@ void Turtlebot3Drive::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
 	tb3_pose_ = atan2(siny, cosy);
 }
 
-void Turtlebot3Drive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
+void Turtlebot3Automation::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
   uint16_t scan_angle[3] = {0, 30, 330};
 
@@ -84,7 +84,7 @@ void Turtlebot3Drive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPt
   }
 }
 
-void Turtlebot3Drive::updatecommandVelocity(double linear, double angular)
+void Turtlebot3Automation::updatecommandVelocity(double linear, double angular)
 {
   geometry_msgs::Twist cmd_vel;
 
@@ -97,62 +97,75 @@ void Turtlebot3Drive::updatecommandVelocity(double linear, double angular)
 /*******************************************************************************
 * Control Loop function
 *******************************************************************************/
-bool Turtlebot3Drive::controlLoop()
+bool Turtlebot3Automation::controlLoop()
 {
   static uint8_t turtlebot3_state_num = 0;
 
-  switch(turtlebot3_state_num)
+  if(nh_.hasParam("controller"))
   {
-    case GET_TB3_DIRECTION:
-      if (scan_data_[CENTER] > check_forward_dist_)
-      {
-        if (scan_data_[LEFT] < check_side_dist_)
-        {
-          prev_tb3_pose_ = tb3_pose_;
-          turtlebot3_state_num = TB3_RIGHT_TURN;
-        }
-        else if (scan_data_[RIGHT] < check_side_dist_)
-        {
-          prev_tb3_pose_ = tb3_pose_;
-          turtlebot3_state_num = TB3_LEFT_TURN;
-        }
-        else
-        {
-          turtlebot3_state_num = TB3_DRIVE_FORWARD;
-        }
-      }
-
-      if (scan_data_[CENTER] < check_forward_dist_)
-      {
-        prev_tb3_pose_ = tb3_pose_;
-        turtlebot3_state_num = TB3_RIGHT_TURN;
-      }
-      break;
-
-    case TB3_DRIVE_FORWARD:
-      updatecommandVelocity(LINEAR_VELOCITY, 0.0);
-      turtlebot3_state_num = GET_TB3_DIRECTION;
-      break;
-
-    case TB3_RIGHT_TURN:
-      if (fabs(prev_tb3_pose_ - tb3_pose_) >= escape_range_)
-        turtlebot3_state_num = GET_TB3_DIRECTION;
-      else
-        updatecommandVelocity(0.0, -1 * ANGULAR_VELOCITY);
-      break;
-
-    case TB3_LEFT_TURN:
-      if (fabs(prev_tb3_pose_ - tb3_pose_) >= escape_range_)
-        turtlebot3_state_num = GET_TB3_DIRECTION;
-      else
-        updatecommandVelocity(0.0, ANGULAR_VELOCITY);
-      break;
-
-    default:
-      turtlebot3_state_num = GET_TB3_DIRECTION;
-      break;
+  	nh_.getParam("controller", currentController);
   }
 
+
+  if(currentController == 1)
+  {
+  ROS_INFO("x=%ld", (long int)currentController);
+	  switch(turtlebot3_state_num)
+	  {
+	    case GET_TB3_DIRECTION:
+	      if (scan_data_[CENTER] > check_forward_dist_)
+	      {
+		if (scan_data_[LEFT] < check_side_dist_)
+		{
+		  prev_tb3_pose_ = tb3_pose_;
+		  turtlebot3_state_num = TB3_RIGHT_TURN;
+		}
+		else if (scan_data_[RIGHT] < check_side_dist_)
+		{
+		  prev_tb3_pose_ = tb3_pose_;
+		  turtlebot3_state_num = TB3_LEFT_TURN;
+		}
+		else
+		{
+		  turtlebot3_state_num = TB3_DRIVE_FORWARD;
+		}
+	      }
+
+	      if (scan_data_[CENTER] < check_forward_dist_)
+	      {
+		prev_tb3_pose_ = tb3_pose_;
+		turtlebot3_state_num = TB3_RIGHT_TURN;
+	      }
+	      break;
+
+	    case TB3_DRIVE_FORWARD:
+	      updatecommandVelocity(LINEAR_VELOCITY, 0.0);
+	      turtlebot3_state_num = GET_TB3_DIRECTION;
+	      break;
+
+	    case TB3_RIGHT_TURN:
+	      if (fabs(prev_tb3_pose_ - tb3_pose_) >= escape_range_)
+		turtlebot3_state_num = GET_TB3_DIRECTION;
+	      else
+		updatecommandVelocity(0.0, -1 * ANGULAR_VELOCITY);
+	      break;
+
+	    case TB3_LEFT_TURN:
+	      if (fabs(prev_tb3_pose_ - tb3_pose_) >= escape_range_)
+		turtlebot3_state_num = GET_TB3_DIRECTION;
+	      else
+		updatecommandVelocity(0.0, ANGULAR_VELOCITY);
+	      break;
+
+	    default:
+	      turtlebot3_state_num = GET_TB3_DIRECTION;
+	      break;
+	  }
+
+  }
+
+		
+  
   return true;
 }
 
@@ -161,14 +174,14 @@ bool Turtlebot3Drive::controlLoop()
 *******************************************************************************/
 int main(int argc, char* argv[])
 {
-  ros::init(argc, argv, "turtlebot3_drive");
-  Turtlebot3Drive turtlebot3_drive;
+  ros::init(argc, argv, "turtlebot3_automation");
+  Turtlebot3Automation turtlebot3_automation;
 
   ros::Rate loop_rate(125);
 
   while (ros::ok())
   {
-    turtlebot3_drive.controlLoop();
+    turtlebot3_automation.controlLoop();
     ros::spinOnce();
     loop_rate.sleep();
   }

@@ -16,14 +16,16 @@
 
 /* Authors: Taehun Lim (Darby) */
 
-#ifndef TURTLEBOT3_DRIVE2_H_
-#define TURTLEBOT3_DRIVE2_H_
+#ifndef TURTLEBOT3_SUPERVISOR_H_
+#define TURTLEBOT3_SUPERVISOR_H_
 
 #include <ros/ros.h>
 
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
+
+
 
 #define DEG2RAD (M_PI / 180.0)
 #define RAD2DEG (180.0 / M_PI)
@@ -40,11 +42,11 @@
 #define TB3_RIGHT_TURN    2
 #define TB3_LEFT_TURN     3
 
-class Turtlebot3Drive2
+class Turtlebot3Supervisor
 {
  public:
-  Turtlebot3Drive2();
-  ~Turtlebot3Drive2();
+  Turtlebot3Supervisor();
+  ~Turtlebot3Supervisor();
   bool init();
   bool controlLoop();
 
@@ -52,6 +54,10 @@ class Turtlebot3Drive2
   // ROS NodeHandle
   ros::NodeHandle nh_;
   ros::NodeHandle nh_priv_;
+
+  double linMaxVel = 0.3;
+  double angMaxVel = 1.5;
+  int currentController = 1;
 
   // ROS Parameters
 
@@ -79,4 +85,4 @@ class Turtlebot3Drive2
   void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
 };
-#endif // TURTLEBOT3_DRIVE2_H_
+#endif // TURTLEBOT3_SUPERVISOR_H_
