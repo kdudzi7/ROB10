@@ -95,7 +95,6 @@ def makeSimpleProfile(output, input, slop):
     return output
 
 def constrain(input, low, high):
-    high = rospy.get_param("linear_max_vel");
     if input < low:
       input = low
     elif input > high:
@@ -184,6 +183,11 @@ if __name__=="__main__":
                 twist.angular.x = 0.0; twist.angular.y = 0.0; twist.angular.z = control_angular_vel
 
                 pub.publish(twist)
+            else:
+                target_linear_vel   = 0.0
+                control_linear_vel  = 0.0
+                target_angular_vel  = 0.0
+                control_angular_vel = 0.0
 
     except:
         print(e)
@@ -192,8 +196,7 @@ if __name__=="__main__":
         twist = Twist()
         twist.linear.x = 0.0; twist.linear.y = 0.0; twist.linear.z = 0.0
         twist.angular.x = 0.0; twist.angular.y = 0.0; twist.angular.z = 0.0
-        if rospy.get_param("controller") == 0 :
-            pub.publish(twist)
+        pub.publish(twist)
 
     if os.name != 'nt':
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)

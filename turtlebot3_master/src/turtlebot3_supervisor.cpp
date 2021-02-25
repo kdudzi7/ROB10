@@ -32,8 +32,8 @@ bool Turtlebot3Supervisor::init()
 {
   // initialize ROS parameter
   std::string cmd_vel_topic_name = nh_.param<std::string>("cmd_vel_topic_name", "");
-  nh_.setParam("linear_max_vel", 0.1);
-  nh_.setParam("angular_max_vel", 0.1);
+  nh_.setParam("linear_max_vel", 0.22);
+  nh_.setParam("angular_max_vel", 2.84);
   nh_.setParam("controller", 0);
 
   // initialize variables
@@ -58,11 +58,11 @@ void Turtlebot3Supervisor::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &m
 {
   if(msg->pose.pose.position.x > 0)
   {
-	nh_.setParam("linear_max_vel", 0.5);
+	nh_.setParam("controller", 0);
   }
   else
   {
-	nh_.setParam("linear_max_vel", 0.1);
+	nh_.setParam("controller", 1);
   }
 }
 
