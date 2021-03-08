@@ -25,6 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "geometry_msgs/Twist.h"
 #include "ros/ros.h"
 #include "sensor_msgs/Joy.h"
+#include <sensor_msgs/JoyFeedbackArray.h>
 #include "teleop_twist_joy2/teleop_twist_joy2.h"
 
 #include <map>
@@ -46,6 +47,7 @@ struct TeleopTwistJoy::Impl
 
   ros::Subscriber joy_sub;
   ros::Publisher cmd_vel_pub;
+  ros::Publisher feedback_pub_;
 
   int enable_button;
   int enable_turbo_button;
@@ -70,6 +72,7 @@ TeleopTwistJoy::TeleopTwistJoy(ros::NodeHandle* nh, ros::NodeHandle* nh_param)
 
   pimpl_->cmd_vel_pub = nh->advertise<geometry_msgs::Twist>("cmd_vel", 1, true);
   pimpl_->joy_sub = nh->subscribe<sensor_msgs::Joy>("joy", 1, &TeleopTwistJoy::Impl::joyCallback, pimpl_);
+  pimpl_->feedback_pub_ = nh->advertise<sensor_msgs::JoyFeedbackArray>("/joy/set_feedback", 5);
 
   nh_param->param<int>("enable_button", pimpl_->enable_button, 0);
   nh_param->param<int>("enable_turbo_button", pimpl_->enable_turbo_button, -1);
@@ -152,6 +155,17 @@ void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_m
 
   cmd_vel_pub.publish(cmd_vel_msg);
   sent_disable_msg = false;
+
+		sensor_msgs::JoyFeedbackArray feedback_array;
+  		sensor_msgs::JoyFeedbackPtr feedback(new sensor_msgs::JoyFeedback());
+        feedback->type = sensor_msgs::JoyFeedback::TYPE_RUMBLE;
+		feedback->id = 0;
+		feedback->intensity = 1.0;
+        feedback_array.array.push_back(*feedback);
+		feedback->id = 1;
+		feedback->intensity = 1.0;
+        feedback_array.array.push_back(*feedback);
+		feedback_pub_.publish(feedback_array);
 }
 
 void TeleopTwistJoy::Impl::joyCallback(const sensor_msgs::Joy::ConstPtr& joy_msg)
