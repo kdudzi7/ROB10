@@ -73,6 +73,96 @@ Visualization Manager:
           Value: true
         tb3_0/wheel_right_link:
           Value: true
+        tb3_1/base_footprint:
+          Value: true
+        tb3_1/base_link:
+          Value: true
+        tb3_1/base_scan:
+          Value: true
+        tb3_1/caster_back_link:
+          Value: true
+        tb3_1/imu_link:
+          Value: true
+        tb3_1/map:
+          Value: true
+        tb3_1/odom:
+          Value: true
+        tb3_1/wheel_left_link:
+          Value: true
+        tb3_1/wheel_right_link:
+          Value: true
+        tb3_2/base_footprint:
+          Value: true
+        tb3_2/base_link:
+          Value: true
+        tb3_2/base_scan:
+          Value: true
+        tb3_2/caster_back_link:
+          Value: true
+        tb3_2/imu_link:
+          Value: true
+        tb3_2/map:
+          Value: true
+        tb3_2/odom:
+          Value: true
+        tb3_2/wheel_left_link:
+          Value: true
+        tb3_2/wheel_right_link:
+          Value: true
+        tb3_3/base_footprint:
+          Value: true
+        tb3_3/base_link:
+          Value: true
+        tb3_3/base_scan:
+          Value: true
+        tb3_3/caster_back_link:
+          Value: true
+        tb3_3/imu_link:
+          Value: true
+        tb3_3/map:
+          Value: true
+        tb3_3/odom:
+          Value: true
+        tb3_3/wheel_left_link:
+          Value: true
+        tb3_3/wheel_right_link:
+          Value: true
+        tb3_4/base_footprint:
+          Value: true
+        tb3_4/base_link:
+          Value: true
+        tb3_4/base_scan:
+          Value: true
+        tb3_4/caster_back_link:
+          Value: true
+        tb3_4/imu_link:
+          Value: true
+        tb3_4/map:
+          Value: true
+        tb3_4/odom:
+          Value: true
+        tb3_4/wheel_left_link:
+          Value: true
+        tb3_4/wheel_right_link:
+          Value: true
+        tb3_5/base_footprint:
+          Value: true
+        tb3_5/base_link:
+          Value: true
+        tb3_5/base_scan:
+          Value: true
+        tb3_5/caster_back_link:
+          Value: true
+        tb3_5/imu_link:
+          Value: true
+        tb3_5/map:
+          Value: true
+        tb3_5/odom:
+          Value: true
+        tb3_5/wheel_left_link:
+          Value: true
+        tb3_5/wheel_right_link:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -93,6 +183,76 @@ Visualization Manager:
                   tb3_0/wheel_left_link:
                     {}
                   tb3_0/wheel_right_link:
+                    {}
+          tb3_1/map:
+            tb3_1/odom:
+              tb3_1/base_footprint:
+                tb3_1/base_link:
+                  tb3_1/base_scan:
+                    {}
+                  tb3_1/caster_back_link:
+                    {}
+                  tb3_1/imu_link:
+                    {}
+                  tb3_1/wheel_left_link:
+                    {}
+                  tb3_1/wheel_right_link:
+                    {}
+          tb3_2/map:
+            tb3_2/odom:
+              tb3_2/base_footprint:
+                tb3_2/base_link:
+                  tb3_2/base_scan:
+                    {}
+                  tb3_2/caster_back_link:
+                    {}
+                  tb3_2/imu_link:
+                    {}
+                  tb3_2/wheel_left_link:
+                    {}
+                  tb3_2/wheel_right_link:
+                    {}
+          tb3_3/map:
+            tb3_3/odom:
+              tb3_3/base_footprint:
+                tb3_3/base_link:
+                  tb3_3/base_scan:
+                    {}
+                  tb3_3/caster_back_link:
+                    {}
+                  tb3_3/imu_link:
+                    {}
+                  tb3_3/wheel_left_link:
+                    {}
+                  tb3_3/wheel_right_link:
+                    {}
+          tb3_4/map:
+            tb3_4/odom:
+              tb3_4/base_footprint:
+                tb3_4/base_link:
+                  tb3_4/base_scan:
+                    {}
+                  tb3_4/caster_back_link:
+                    {}
+                  tb3_4/imu_link:
+                    {}
+                  tb3_4/wheel_left_link:
+                    {}
+                  tb3_4/wheel_right_link:
+                    {}
+          tb3_5/map:
+            tb3_5/odom:
+              tb3_5/base_footprint:
+                tb3_5/base_link:
+                  tb3_5/base_scan:
+                    {}
+                  tb3_5/caster_back_link:
+                    {}
+                  tb3_5/imu_link:
+                    {}
+                  tb3_5/wheel_left_link:
+                    {}
+                  tb3_5/wheel_right_link:
                     {}
       Update Interval: 0
       Value: true
@@ -125,6 +285,157 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /tb3_1/scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /tb3_2/scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /tb3_3/scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /tb3_4/scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /tb3_5/scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
@@ -217,6 +528,278 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+      Name: RobotModel
+      Robot Description: tb3_1/robot_description
+      TF Prefix: tb3_1
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: tb3_2/robot_description
+      TF Prefix: tb3_2
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: tb3_3/robot_description
+      TF Prefix: tb3_3
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: tb3_4/robot_description
+      TF Prefix: tb3_4
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: tb3_5/robot_description
+      TF Prefix: tb3_5
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /tb3_0/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /tb3_1/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /tb3_2/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /tb3_3/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /tb3_4/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /tb3_5/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
