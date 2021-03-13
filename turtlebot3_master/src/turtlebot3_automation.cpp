@@ -55,6 +55,7 @@ bool Turtlebot3Automation::init()
   // initialize subscribers
   laser_scan_sub_  = nh_.subscribe("scan", 10, &Turtlebot3Automation::laserScanMsgCallBack, this);
   odom_sub_ = nh_.subscribe("odom", 10, &Turtlebot3Automation::odomMsgCallBack, this);
+  super_sub_ = nh_.subscribe("super_cmd", 10, &Turtlebot3Automation::superCallBack, this);
 
   return true;
 }
@@ -84,6 +85,14 @@ void Turtlebot3Automation::laserScanMsgCallBack(const sensor_msgs::LaserScan::Co
   }
 }
 
+void Turtlebot3Automation::superCallBack(const turtlebot3_master::Super::ConstPtr &msg)
+{
+  controller = msg->controller;
+  linearVelLimit = msg->linearVelLimit;
+  angularVelLimit = msg->angularVelLimit;
+  minDist = msg->minDist;  
+}
+
 void Turtlebot3Automation::updatecommandVelocity(double linear, double angular)
 {
   geometry_msgs::Twist cmd_vel;
@@ -101,15 +110,9 @@ bool Turtlebot3Automation::controlLoop()
 {
   static uint8_t turtlebot3_state_num = 0;
 
-  if(nh_.hasParam("controller"))
+  if(controller == 3)
   {
-  	nh_.getParam("controller", currentController);
-  }
-
-
-  if(currentController == 1)
-  {
-  ROS_INFO("x=%ld", (long int)currentController);
+  ROS_INFO("x=%ld", (long int)controller);
 	  switch(turtlebot3_state_num)
 	  {
 	    case GET_TB3_DIRECTION:

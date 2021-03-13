@@ -18,10 +18,7 @@ Turtlebot3Supervisor::Turtlebot3Supervisor()
 
 Turtlebot3Supervisor::~Turtlebot3Supervisor()
 {
-  updatecommandVelocity(0.0, 0.0);
-  nh_.deleteParam("linear_max_vel");	
-  nh_.deleteParam("angular_max_vel");	
-  nh_.deleteParam("controller");
+  updatecommandVelocity(0, 0.0, 0.0, 1.0);
   ros::shutdown();
 }
 
@@ -32,9 +29,6 @@ bool Turtlebot3Supervisor::init()
 {
   // initialize ROS parameter
   std::string cmd_vel_topic_name = nh_.param<std::string>("cmd_vel_topic_name", "");
-  nh_.setParam("linear_max_vel", 0.22);
-  nh_.setParam("angular_max_vel", 2.84);
-  nh_.setParam("controller", 0);
 
   // initialize variables
   escape_range_       = 30.0 * DEG2RAD;
@@ -45,7 +39,7 @@ bool Turtlebot3Supervisor::init()
   prev_tb3_pose_ = 0.0;
 
   // initialize publishers
-  cmd_vel_pub_   = nh_.advertise<geometry_msgs::Twist>(cmd_vel_topic_name, 10);
+  super_pub_   = nh_.advertise<turtlebot3_master::Super>("super_cmd", 10);
 
   // initialize subscribers
   laser_scan_sub_  = nh_.subscribe("scan", 10, &Turtlebot3Supervisor::laserScanMsgCallBack, this);
@@ -58,11 +52,11 @@ void Turtlebot3Supervisor::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &m
 {
   if(msg->pose.pose.position.x > 0)
   {
-	nh_.setParam("controller", 0);
+    updatecommandVelocity(2,0.22,2.0,1.0);
   }
   else
   {
-	nh_.setParam("controller", 1);
+    updatecommandVelocity(3,0.22,2.0,1.0);
   }
 }
 
@@ -83,14 +77,16 @@ void Turtlebot3Supervisor::laserScanMsgCallBack(const sensor_msgs::LaserScan::Co
   }
 }
 
-void Turtlebot3Supervisor::updatecommandVelocity(double linear, double angular)
+void Turtlebot3Supervisor::updatecommandVelocity(int controller, float linearVelLimit, float angularVelLimit, float minDist)
 {
-  geometry_msgs::Twist cmd_vel;
+  turtlebot3_master::Super super_cmd;
 
-  cmd_vel.linear.x  = linear;
-  cmd_vel.angular.z = angular;
+  super_cmd.controller  = controller;
+  super_cmd.linearVelLimit = linearVelLimit;
+  super_cmd.angularVelLimit = angularVelLimit;
+  super_cmd.minDist = minDist;
 
-  cmd_vel_pub_.publish(cmd_vel);
+  super_pub_.publish(super_cmd);
 }
 
 /*******************************************************************************
@@ -98,7 +94,6 @@ void Turtlebot3Supervisor::updatecommandVelocity(double linear, double angular)
 *******************************************************************************/
 bool Turtlebot3Supervisor::controlLoop()
 {
-  
   return true;
 }
 

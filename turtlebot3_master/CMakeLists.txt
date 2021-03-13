@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   tf
   gazebo_ros
+  message_generation
 )
 
 find_package(gazebo REQUIRED)
@@ -29,17 +30,31 @@ find_package(gazebo REQUIRED)
 ################################################################################
 # Declare ROS messages, services and actions
 ################################################################################
+add_message_files(
+  FILES
+  Super.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################################################
 # Declare ROS dynamic reconfigure parameters
 ################################################################################
+
+
+
+
+
 
 ################################################################################
 # Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs nav_msgs tf gazebo_ros
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs nav_msgs tf gazebo_ros message_runtime
   DEPENDS gazebo
 )
 

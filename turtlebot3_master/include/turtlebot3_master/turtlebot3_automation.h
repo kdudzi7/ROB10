@@ -24,6 +24,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
+#include <turtlebot3_master/Super.h>
 
 
 
@@ -55,9 +56,10 @@ class Turtlebot3Automation
   ros::NodeHandle nh_;
   ros::NodeHandle nh_priv_;
 
-  double linMaxVel = 0.3;
-  double angMaxVel = 1.5;
-  int currentController = 1;
+  int controller = 0;
+  float linearVelLimit = 0.0;
+  float angularVelLimit = 0.0;
+  float minDist = 1.0;
 
   // ROS Parameters
 
@@ -69,6 +71,7 @@ class Turtlebot3Automation
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
+  ros::Subscriber super_sub_;
 
   // Variables
   double escape_range_;
@@ -84,5 +87,6 @@ class Turtlebot3Automation
   void updatecommandVelocity(double linear, double angular);
   void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
+  void superCallBack(const turtlebot3_master::Super::ConstPtr &msg);
 };
 #endif // TURTLEBOT3_AUTOMATION_H_

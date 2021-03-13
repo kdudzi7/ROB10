@@ -24,6 +24,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
+#include <turtlebot3_master/Super.h>
 
 
 
@@ -64,7 +65,7 @@ class Turtlebot3Supervisor
   // ROS Time
 
   // ROS Topic Publishers
-  ros::Publisher cmd_vel_pub_;
+  ros::Publisher super_pub_;
 
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
@@ -81,7 +82,7 @@ class Turtlebot3Supervisor
   double prev_tb3_pose_;
 
   // Function prototypes
-  void updatecommandVelocity(double linear, double angular);
+  void updatecommandVelocity(int controller, float linearVelLimit, float angularVelLimit, float minDist);
   void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
 };

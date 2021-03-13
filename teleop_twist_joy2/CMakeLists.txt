@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(teleop_twist_joy2)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs roscpp sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs roscpp sensor_msgs message_generation turtlebot3_master)
 
 catkin_package(
   INCLUDE_DIRS include

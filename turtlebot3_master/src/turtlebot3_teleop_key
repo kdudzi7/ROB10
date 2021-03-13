@@ -29,6 +29,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
+from turtlebot3_master.msg import Super
 import sys, select, os
 if os.name == 'nt':
   import msvcrt
@@ -43,6 +44,9 @@ WAFFLE_MAX_ANG_VEL = 1.82
 
 LIN_VEL_STEP_SIZE = 0.01
 ANG_VEL_STEP_SIZE = 0.1
+
+controller = 0
+minDist = 0.0
 
 msg = """
 Control Your TurtleBot3!
@@ -124,12 +128,23 @@ def checkAngularLimitVelocity(vel):
 
     return vel
 
+def callback(data):
+    global controller
+    controller = data.controller
+    global BURGER_MAX_LIN_VEL
+    BURGER_MAX_LIN_VEL = data.linearVelLimit
+    global BURGER_MAX_ANG_VEL
+    BURGER_MAX_ANG_VEL = data.angularVelLimit
+    global minDist
+    minDist = data.minDist
+
 if __name__=="__main__":
     if os.name != 'nt':
         settings = termios.tcgetattr(sys.stdin)
 
     rospy.init_node('turtlebot3_teleop')
     pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
+    sub = rospy.Subscriber('super_cmd', Super, callback);
 
     turtlebot3_model = rospy.get_param("model", "burger")
 
@@ -139,10 +154,12 @@ if __name__=="__main__":
     control_linear_vel  = 0.0
     control_angular_vel = 0.0
 
+
+
     try:
         print(msg)
         while(1):
-            if rospy.get_param("controller") == 0 :
+            if controller == 1 :
                 key = getKey()
                 if key == 'w' :
                     target_linear_vel = checkLinearLimitVelocity(target_linear_vel + LIN_VEL_STEP_SIZE)

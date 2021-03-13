@@ -27,6 +27,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "sensor_msgs/Joy.h"
 #include <sensor_msgs/JoyFeedbackArray.h>
 #include "teleop_twist_joy2/teleop_twist_joy2.h"
+#include <turtlebot3_master/Super.h>
 
 #include <map>
 #include <string>
@@ -43,9 +44,11 @@ namespace teleop_twist_joy
 struct TeleopTwistJoy::Impl
 {
   void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
+  void superCallback(const turtlebot3_master::Super::ConstPtr& super);
   void sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_msg, const std::string& which_map);
 
   ros::Subscriber joy_sub;
+  ros::Subscriber super_sub;
   ros::Publisher cmd_vel_pub;
   ros::Publisher feedback_pub_;
 
@@ -59,6 +62,11 @@ struct TeleopTwistJoy::Impl
   std::map< std::string, std::map<std::string, double> > scale_angular_map;
 
   bool sent_disable_msg;
+
+  int controller = 0;
+  float linearVelLimit = 0.0;
+  float angularVelLimit = 0.0;
+  float minDist = 1.0;
 };
 
 /**
@@ -72,6 +80,7 @@ TeleopTwistJoy::TeleopTwistJoy(ros::NodeHandle* nh, ros::NodeHandle* nh_param)
 
   pimpl_->cmd_vel_pub = nh->advertise<geometry_msgs::Twist>("cmd_vel", 1, true);
   pimpl_->joy_sub = nh->subscribe<sensor_msgs::Joy>("joy", 1, &TeleopTwistJoy::Impl::joyCallback, pimpl_);
+  pimpl_->super_sub = nh->subscribe<turtlebot3_master::Super>("super_cmd", 1, &TeleopTwistJoy::Impl::superCallback, pimpl_);
   pimpl_->feedback_pub_ = nh->advertise<sensor_msgs::JoyFeedbackArray>("/joy/set_feedback", 5);
 
   nh_param->param<int>("enable_button", pimpl_->enable_button, 0);
@@ -153,6 +162,8 @@ void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_m
   cmd_vel_msg.angular.y = getVal(joy_msg, axis_angular_map, scale_angular_map[which_map], "pitch");
   cmd_vel_msg.angular.x = getVal(joy_msg, axis_angular_map, scale_angular_map[which_map], "roll");
 
+
+ 
   cmd_vel_pub.publish(cmd_vel_msg);
   sent_disable_msg = false;
 
@@ -177,10 +188,15 @@ void TeleopTwistJoy::Impl::joyCallback(const sensor_msgs::Joy::ConstPtr& joy_msg
     sendCmdVelMsg(joy_msg, "turbo");
   }
   else if (joy_msg->buttons.size() > enable_button &&
-           joy_msg->buttons[enable_button])
+           joy_msg->buttons[enable_button] && controller == 2)
   {
     sendCmdVelMsg(joy_msg, "normal");
   }
+  else if (joy_msg->buttons.size() > enable_button &&
+           joy_msg->buttons[enable_button] && controller != 2)
+  {
+    ROS_WARN("You are not in control here!");
+  } 
   else
   {
     // When enable button is released, immediately send a single no-motion command
@@ -193,6 +209,14 @@ void TeleopTwistJoy::Impl::joyCallback(const sensor_msgs::Joy::ConstPtr& joy_msg
       sent_disable_msg = true;
     }
   }
+}
+
+void TeleopTwistJoy::Impl::superCallback(const turtlebot3_master::Super::ConstPtr& super_msg)
+{
+  controller = super_msg->controller;
+  linearVelLimit = super_msg->linearVelLimit;
+  angularVelLimit = super_msg->angularVelLimit;
+  minDist = super_msg->minDist;
 }
 
 }  // namespace teleop_twist_joy
