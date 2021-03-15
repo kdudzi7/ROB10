@@ -90,7 +90,7 @@ void Turtlebot3Supervisor::laserScanEvalMsgCallBack(const turtlebot3_master::Sca
     ROS_INFO("%f", msg->type[30]);
     for(int i = 0; i < 30; i++)
     {
-        if(msg->angles[i] <= 360 && msg->angles)
+        if(msg->angles[i] <= 360 && msg->angles[i] >= 0.001)
         scanAngles[i] = msg->angles[i];
     }
     for(int i = 0; i < 30; i++)
