@@ -25,6 +25,7 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <turtlebot3_master/Super.h>
+#include <turtlebot3_master/ScanData.h>
 
 
 
@@ -66,10 +67,11 @@ class Turtlebot3Supervisor
 
   // ROS Topic Publishers
   ros::Publisher super_pub_;
-
+            
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
+  ros::Subscriber laser_scan_eval_sub_;
 
   // Variables
   double escape_range_;
@@ -78,12 +80,17 @@ class Turtlebot3Supervisor
 
   double scan_data_[3] = {0.0, 0.0, 0.0};
 
+  float scanAngles[30] = {0};
+  float scanRanges[30] = {0};
+  float scanTypes[30] = {0};
+
   double tb3_pose_;
   double prev_tb3_pose_;
 
   // Function prototypes
   void updatecommandVelocity(int controller, float linearVelLimit, float angularVelLimit, float minDist);
   void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
+  void laserScanEvalMsgCallBack(const turtlebot3_master::ScanData::ConstPtr &msg);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
 };
 #endif // TURTLEBOT3_SUPERVISOR_H_

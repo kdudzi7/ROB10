@@ -33,6 +33,7 @@ find_package(gazebo REQUIRED)
 add_message_files(
   FILES
   Super.msg
+  ScanData.msg
 )
 
 generate_messages(

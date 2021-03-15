@@ -38,11 +38,18 @@ bool Turtlebot3Supervisor::init()
   tb3_pose_ = 0.0;
   prev_tb3_pose_ = 0.0;
 
+  for(int i = 0; i < sizeof(scanAngles)/sizeof(*scanAngles); i++)
+  {
+      scanAngles[i] = 0;
+      scanRanges[i] = 0;
+      scanTypes[i] = 0;
+  }
   // initialize publishers
   super_pub_   = nh_.advertise<turtlebot3_master::Super>("super_cmd", 10);
 
   // initialize subscribers
   laser_scan_sub_  = nh_.subscribe("scan", 10, &Turtlebot3Supervisor::laserScanMsgCallBack, this);
+  laser_scan_eval_sub_ = nh_.subscribe("scanEval", 10, &Turtlebot3Supervisor::laserScanEvalMsgCallBack, this);
   odom_sub_ = nh_.subscribe("odom", 10, &Turtlebot3Supervisor::odomMsgCallBack, this);
 
   return true;
@@ -75,6 +82,37 @@ void Turtlebot3Supervisor::laserScanMsgCallBack(const sensor_msgs::LaserScan::Co
       scan_data_[num] = msg->ranges.at(scan_angle[num]);
     }
   }
+}
+
+void Turtlebot3Supervisor::laserScanEvalMsgCallBack(const turtlebot3_master::ScanData::ConstPtr &msg)
+{
+    ROS_INFO("RECEIVED");
+    ROS_INFO("%f", msg->type[30]);
+    for(int i = 0; i < 30; i++)
+    {
+        if(msg->angles[i] <= 360 && msg->angles)
+        scanAngles[i] = msg->angles[i];
+    }
+    for(int i = 0; i < 30; i++)
+    {
+        if(msg->ranges[i] <= 20 && msg->ranges[i] >= 0.001)
+        scanRanges[i] = msg->ranges[i];
+    }
+    for(int i = 0; i < 30; i++)
+    {
+        if(msg->type[i] < 4 && msg->type[i] >= 0.0)
+        scanTypes[i] = msg->type[i];
+    }
+
+
+
+    ROS_INFO("ScanAngles %i", sizeof(scanAngles)/sizeof(*scanAngles));
+    for(int i = 0; i < sizeof(scanAngles)/sizeof(*scanAngles); i++)
+    {
+        ROS_INFO("Scan %f", scanAngles[i]);
+        ROS_INFO("Range %f", scanRanges[i]);
+        ROS_INFO("Type %f", scanTypes[i]);
+    }  
 }
 
 void Turtlebot3Supervisor::updatecommandVelocity(int controller, float linearVelLimit, float angularVelLimit, float minDist)
