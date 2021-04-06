@@ -1,4 +1,0 @@
-uint8 controller
-float64 linearVelLimit
-float64 angularVelLimit
-float64 minDist
