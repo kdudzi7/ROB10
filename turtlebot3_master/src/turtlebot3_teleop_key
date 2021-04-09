@@ -29,7 +29,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from turtlebot3_master.msg import Super
+#from turtlebot3_master.msg import Super
 import sys, select, os
 if os.name == 'nt':
   import msvcrt
@@ -45,7 +45,7 @@ WAFFLE_MAX_ANG_VEL = 1.82
 LIN_VEL_STEP_SIZE = 0.01
 ANG_VEL_STEP_SIZE = 0.1
 
-controller = 0
+controller = 1
 minDist = 0.0
 
 msg = """
@@ -144,7 +144,7 @@ if __name__=="__main__":
 
     rospy.init_node('turtlebot3_teleop')
     pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
-    sub = rospy.Subscriber('super_cmd', Super, callback);
+   # sub = rospy.Subscriber('super_cmd', Super, callback);
 
     turtlebot3_model = rospy.get_param("model", "burger")
 

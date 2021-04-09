@@ -42,7 +42,7 @@ bool Turtlebot3Supervisor::init()
 
   // initialize publishers
   super_pub_ = nh_.advertise<turtlebot3_master::Super>("super_cmd", 10);
-  cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_velX", 10);
     move_base_goal_pub_ = nh_.advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 10);
     move_base_goal_cancel_pub_ = nh_.advertise<actionlib_msgs::GoalID>("move_base/cancel", 10);
 
