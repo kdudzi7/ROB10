@@ -24,5 +24,4 @@
 
 
   <include file="$(find turtlebot3_master)/launch/turtlebot3_start.launch" />
-  <include file="$(find teleop_twist_joy2)/launch/teleop.launch" />
 </launch>
