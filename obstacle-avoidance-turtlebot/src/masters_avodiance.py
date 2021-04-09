@@ -16,6 +16,7 @@ from sensor_msgs.msg import LaserScan # LaserScan type message is defined in sen
 from geometry_msgs.msg import Twist #
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
+from std_msgs.msg import String,Int32,Int32MultiArray,MultiArrayLayout,MultiArrayDimension
 
 
 positionx = None
@@ -82,7 +83,7 @@ def cutCirle():
 	matrix[194,160] = [254 , 50 ,50]
 	matrix[199,151] = [254 , 50 ,50]
 	pp.imshow(matrix)
-	pp.show()
+	#pp.show()
 	#pp.close("all")
 	disntance_array = []
 	angle_array = []
@@ -164,6 +165,18 @@ def cutCirle():
 		del disntance_array
 		del angle_array
 		x,y  = point_on_circle()
+		for xy in range(sizeArray):			
+			#print('value' , x)
+			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
+			if x - (x * 0.05) <= xcoords[xy] <= x + (x * 0.05):
+				indexxy = xy
+				print(indexxy , xcoords[xy] , x )
+				obstacleType = 1
+				if y - (y * 0.05 )<= ycoords[indexxy] <= y + (y * 0.05):
+					print("obstacle in both map and simulation" ,xcoords[xy] , x , ycoords[xy] , y  )
+					obstacleType = 1
+			
+
 		#if(x_on_map + x_on_map * 0.005) >= x or x_on_map - (x_on_map* 0.005) <= x and y_on_map + (y_on_map * 0.005) >= y or y_on_map - (y_on_map * 0.005) <= y :
 		if x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05) and y_on_map - (y_on_map * 0.05) <= y <=  y_on_map + (y_on_map * 0.05) :
 			print("within a margin" ,x_on_map , x )
@@ -180,10 +193,18 @@ def cutCirle():
 			print ("There is obstacle only in simulator")
 			obstacleType = 0 
 
+	rate = rospy.Rate(10)
+	array = [obstacleType, closestObstacle , obstacleAngle]
+	my_array_for_publishing = Int32MultiArray(data=array)	
+	#hello_str = obstacleType
+	rospy.loginfo(my_array_for_publishing)
+	pub.publish(my_array_for_publishing)
+
 	
 
 
 	Timer(1, cutCirle).start()
+	return obstacleType
 	#pp.close()
 
 
@@ -202,6 +223,16 @@ def point_on_circle():
     print("czy sie zgadzaja ",x,y)
 
     return x,y
+
+def point_on_circle2():
+	center = [J22, J11]
+	for xy in range(365):
+		angle = (math.radians(xy - 90))
+    	radius = closestObstacle * 19.5    	
+    	if(xy == closestObtacleAngle):
+    		x = J11 + (radius * cos(angle))
+    		y = J22 + (radius * sin(angle))	
+	return x, y
 
 def sector_mask(shape,centre,radius,angle_range):
     
@@ -227,9 +258,23 @@ def NewCoordinates(newx, newy):
 
 	return J11 , J22
 
+
+
+def talker():
+    pub = rospy.Publisher('chatter', String, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        hello_str = "hello world %s" % rospy.get_time()
+        rospy.loginfo(hello_str)
+        pub.publish(hello_str)
+        rate.sleep()
+
+
+
 if __name__ == '__main__':
-	rospy.init_node('check_odometry')
-	pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+	rospy.init_node('ObstacleType')
+	pub = rospy.Publisher("talker", Int32MultiArray, queue_size=10)
 	odom_sub = rospy.Subscriber('/odom', Odometry, callback)
 	sub = rospy.Subscriber("/scan", LaserScan, callback1)		
 	startingx = 280
@@ -280,10 +325,13 @@ if __name__ == '__main__':
 
 
 	print("positionx", positionx)
-	cutCirle()
+	obstacleType = cutCirle()
 	#a = IntList()
 	#a.data = [typeOfObstacle,distance,angle]
 	point_on_circle()
+	print("type",obstacleType)
+	
+	
 	#pub = rospy.Publisher('obstacleType', distance , angle , typeOfObstacle)
 	#rospy.init_node('talker_obstacle')
 	#ros::NodeHandle nh
