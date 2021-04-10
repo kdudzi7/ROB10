@@ -27,6 +27,9 @@ J22 = None
 closestObstacle = 0
 currentPosition = 0
 closestObtacleAngle = 0
+arrayOfObstacles = []
+assumedx = []
+assumedy = []
 
 def callback1(dt):   
 
@@ -37,13 +40,36 @@ def callback1(dt):
     #print '-------------------------------------------'
     global closestObstacle
     global closestObtacleAngle
+    global arrayOfObstacles
+    global assumedx
+    global assumedy
     #print(dt.ranges , len(dt.ranges))
     closestObstacle = min(dt.ranges)
     closestObtacleAngle = dt.ranges.index(min(dt.ranges))
     x = (407/2) + -(1) * ((407 - 0) / (10 - (-10)))
+    for distance in range(len(dt.ranges)):
+    	#print (distance)
+    	arrayOfObstacles.append(dt.ranges[distance])
+    	angle = (math.radians(distance - 90))
+    	#print ("kat",angle)
+    	radius = dt.ranges[distance] * 20.35
+    	x = J11 + (radius * cos(angle))
+    	y = J22 + (radius * sin(angle))      	
+    	assumedx.append(x)
+    	assumedy.append(y)
+    	#print("odleglosc", radius)
+    	#arrayOfObstacles[distance] = dt.ranges[distance]
     #print(closestObstacle)
     #closestObstacle = (383.5/2) + -(closestObstacle) * ((383.5 - 0) / (10 - (-10)))
     #print(closestObstacle , closestObtacleAngle)
+    #print(arrayOfObstacles[4] , dt.ranges[4])
+
+    #print("dlugosc",len(assumedx), assumedx , arrayOfObstacles)
+    #assumedx = []
+    #assumedy = []
+    #arrayOfObstacles = []
+
+
 
 def callback(msg):
 	#print(msg.pose.pose.position.x)
@@ -69,10 +95,10 @@ def cutCirle():
 	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	pp.imshow(matrix)
-	pp.show()
+	#pp.show()
 	matrix = matrix[200:607, 0:407]
 	pp.imshow(matrix)
-	pp.show()
+	#pp.show()
 	#pp.close("all")
 	mask = sector_mask(matrix.shape,(J22,J11,),71.225,(0,360))
 	matrix[~mask] = 125
@@ -90,7 +116,7 @@ def cutCirle():
 	matrix[newCoorinatex,newCoorinatey] = [254 , 50 ,50]
 	matrix[199,151] = [254 , 50 ,50]
 	pp.imshow(matrix)
-	pp.show()
+	#pp.show()
 	#pp.close("all")
 	disntance_array = []
 	angle_array = []
@@ -100,8 +126,8 @@ def cutCirle():
 		#xcoords = (383.5/2) + -(xcoords) * ((383.5 - 0) / (10 - (-10)))
 		#xcoords = 383.5 - xcoords
 		#J22 = (383.5/2) + -(ycoords) * ((383.5 -  0 )/ (10 - (-10)))
-		print(xcoords)
-		print(ycoords)
+		#print(xcoords)
+		#print(ycoords)
 		#print (xcoords[3])
 		sizeArray = len(xcoords)
 		for x in range(sizeArray):
@@ -171,21 +197,46 @@ def cutCirle():
 
 		del disntance_array
 		del angle_array
-		x,y  = point_on_circle()
-		for xy in range(sizeArray):			
+		#assumedx,assumedy  = point_on_circle2()
+		#print("nasz assumed x", assumedx)
+		obstacleTypeArray = []		
+		for values in range(360):
+			obstacleType = None			
+			for xy in range(len(xcoords)):
+				#print(xy , len(xcoords))
+				
+
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-			if x - (x * 0.04) <= xcoords[xy] <= x + (x * 0.04):
-				indexxy = xy
-				print(indexxy , xcoords[xy] , x )				
-				if y - (y * 0.04)<= ycoords[indexxy] <= y + (y * 0.04):
-					print("obstacle in both map and simulation" ,xcoords[xy] , x , ycoords[xy] , y  )
-					obstacleType = 1
-					break
-			else:
-				print ("changing to 0")
-				obstacleType = 0 
+				if (assumedx[values] - (assumedx[values] * 0.04) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.04)):
+					indexxy = xy
+					#print(indexxy , xcoords[xy] , x )				
+					if (assumedy[values] - (assumedy[values] * 0.04)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.04)):
+						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
+						obstacleType = 1
+						obstacleTypeArray.append(obstacleType)
+						break
 
+						#obstacleType = 1
+					else:
+						if(xy == len(xcoords)-1):
+						
+							#print ("changing to 0.1")
+							obstacleType = 0 
+							obstacleTypeArray.append(obstacleType)
+																  
+							  
+					
+									
+				else:
+					if(xy == len(xcoords)-1):
+					
+						#print ("changing to 0")
+						obstacleType = 0 
+						obstacleTypeArray.append(obstacleType)
+						
+
+					
 		#if(x_on_map + x_on_map * 0.005) >= x or x_on_map - (x_on_map* 0.005) <= x and y_on_map + (y_on_map * 0.005) >= y or y_on_map - (y_on_map * 0.005) <= y :
 		#if x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05) and y_on_map - (y_on_map * 0.05) <= y <=  y_on_map + (y_on_map * 0.05) :
 			#print("within a margin" ,x_on_map , x )
@@ -202,18 +253,26 @@ def cutCirle():
 			print ("There is obstacle only in simulator")
 			obstacleType = 0 
 
+
+	#rrayOfObstacles = arrayOfObstacles[:len(arrayOfObstacles)-360]
+
+	#print("wektor typow", len(obstacleTypeArray), obstacleTypeArray)
+	AnglesObstacles = list(range(1, 360))
+	#print("obstacle",arrayOfObstacles[5])
+
 	rate = rospy.Rate(10)
-	array = [obstacleType, closestObstacle , obstacleAngle]
+	obstacleType1 = [5,5,5]
+	array = [obstacleTypeArray, arrayOfObstacles[:360] , AnglesObstacles]
 	my_array_for_publishing = Int32MultiArray(data=array)	
 	#hello_str = obstacleType
 	rospy.loginfo(my_array_for_publishing)
 	pub.publish(my_array_for_publishing)
+	#arrayOfObstacles = []
 
-	
 
 
 	Timer(1, cutCirle).start()
-	return obstacleType
+	#return obstacleType
 	#pp.close()
 
 
@@ -231,18 +290,28 @@ def point_on_circle():
     x = J11 + (radius * cos(angle))
     y = J22 + (radius * sin(angle))
     print("czy sie zgadzaja ",x,y)
+    print(arrayOfObstacles[4])
 
     return x,y
 
 def point_on_circle2():
-	center = [J22, J11]
+	assumedx = []
+	assumedy = []
+	center = [J22, J11]	
+
 	for xy in range(360):
-		angle = (math.radians(xy - 90))
-    	radius = closestObstacle * 71.2   	
-    	
+		print(xy)
+		angle = (math.radians(xy - 90))		
+    	radius = arrayOfObstacles[xy] * 20.35
+    	print("new radius " , arrayOfObstacles[xy])    	
     	x = J11 + (radius * cos(angle))
-    	y = J22 + (radius * sin(angle))	
-	return x, y
+    	print("nowe x" , x)
+    	y = J22 + (radius * sin(angle))    	
+    	assumedx.append(J11 + (arrayOfObstacles[xy]*20.35 * cos(angle)))
+    	assumedy.append(J22 + (arrayOfObstacles[xy]*20.35 * sin(angle)))
+
+	print("nasz assumed x dlufi" ,assumedx ,assumedx[5])
+	return assumedx , assumedy
 
 def sector_mask(shape,centre,radius,angle_range):
     
@@ -335,11 +404,14 @@ if __name__ == '__main__':
 
 
 	print("positionx", positionx)
-	obstacleType = cutCirle()
+	cutCirle()
 	#a = IntList()
 	#a.data = [typeOfObstacle,distance,angle]
 	point_on_circle()
 	print("type",obstacleType)
+	del assumedx
+	del assumedy
+	del arrayOfObstacles
 	
 	
 	#pub = rospy.Publisher('obstacleType', distance , angle , typeOfObstacle)
