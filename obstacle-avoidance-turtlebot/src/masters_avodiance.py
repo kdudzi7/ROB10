@@ -17,7 +17,7 @@ from geometry_msgs.msg import Twist #
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from std_msgs.msg import String,Int32,Int32MultiArray,MultiArrayLayout,MultiArrayDimension
-
+from turtlebot3_master.msg import ScanData
 
 positionx = None
 positiony = None
@@ -101,7 +101,7 @@ def callback(msg):
 
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
+	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	pp.imshow(matrix)
 	pp.show()
@@ -288,11 +288,15 @@ def cutCirle():
 	pp.imshow(matrix)
 	pp.show()
 	array = [obstacleTypeArray, arrayOfObstacles , AnglesObstacles]
-	my_array_for_publishing = Int32MultiArray(data=array)	
+	#my_array_for_publishing = Int32MultiArray(data=array)	
+	scanDataMsg = ScanData()
+	scanDataMsg.angles = AnglesObstacles
+	scanDataMsg.ranges = arrayOfObstacles
+	scanDataMsg.type = obstacleTypeArray
 	#hello_str = obstacleType
-	rospy.loginfo(my_array_for_publishing)
-	pub.publish(my_array_for_publishing)
-	
+	rospy.loginfo(scanDataMsg)
+	pub.publish(scanDataMsg)
+	print("HAAAAAAAAAAAAAAALLLLLLLLLLLOOOOOOOOOOOOOOOOOO")
 
 	#del arrayOfObstacles
 	#arrayOfObstacles = []
@@ -381,7 +385,7 @@ def talker():
 
 if __name__ == '__main__':
 	rospy.init_node('ObstacleType')
-	pub = rospy.Publisher("talker", Int32MultiArray, queue_size=10)
+	pub = rospy.Publisher("scan_eval", ScanData, queue_size=10)
 	odom_sub = rospy.Subscriber('/odom', Odometry, callback)
 	sub = rospy.Subscriber("/scan", LaserScan, callback1)		
 	startingx = 280
