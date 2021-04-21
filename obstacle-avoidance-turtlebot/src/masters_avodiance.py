@@ -287,7 +287,7 @@ def cutCirle():
 	matrix[assy,assx] = [60 , 254 ,50]
 	pp.imshow(matrix)
 	pp.show()
-	array = [obstacleTypeArray, 1 , 1]
+	array = [obstacleTypeArray, arrayOfObstacles , AnglesObstacles]
 	my_array_for_publishing = Int32MultiArray(data=array)	
 	#hello_str = obstacleType
 	rospy.loginfo(my_array_for_publishing)
