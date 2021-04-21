@@ -27,9 +27,9 @@ J22 = None
 closestObstacle = 0
 currentPosition = 0
 closestObtacleAngle = 0
-arrayOfObstacles = []
-assumedx = []
-assumedy = []
+arrayOfObstacles = list(range(0, 360))
+assumedx = list(range(0, 360))
+assumedy = list(range(0, 360))
 
 def callback1(dt):   
 
@@ -45,18 +45,22 @@ def callback1(dt):
     global assumedy
     #print(dt.ranges , len(dt.ranges))
     closestObstacle = min(dt.ranges)
+    #print("90 odleglosc",dt.ranges[90])
+   # #print ("90 odleglooosc",dt.ranges[dt.ranges[90]] * 20)
     closestObtacleAngle = dt.ranges.index(min(dt.ranges))
     x = (407/2) + -(1) * ((407 - 0) / (10 - (-10)))
     for distance in range(len(dt.ranges)):
     	#print (distance)
-    	arrayOfObstacles.append(dt.ranges[distance])
-    	angle = (math.radians(distance - 90))
+    	arrayOfObstacles[distance] = dt.ranges[distance]
+    	angle = (math.radians(distance))
     	#print ("kat",angle)
-    	radius = dt.ranges[distance] * 20.35
+    	radius = dt.ranges[distance] * 20
+    	#print (distance,dt.ranges[70])
+    	#print (radius)
     	x = J11 + (radius * cos(angle))
     	y = J22 + (radius * sin(angle))      	
-    	assumedx.append(x)
-    	assumedy.append(y)
+    	assumedx[distance] = x
+    	assumedy[distance] = y
     	#print("odleglosc", radius)
     	#arrayOfObstacles[distance] = dt.ranges[distance]
     #print(closestObstacle)
@@ -68,6 +72,11 @@ def callback1(dt):
     #assumedx = []
     #assumedy = []
     #arrayOfObstacles = []
+    if(len(arrayOfObstacles) > 360):
+    	arrayOfObstacles = []
+    	assumedx =[]
+    	assumedy =[]
+
 
 
 
@@ -95,10 +104,10 @@ def cutCirle():
 	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	pp.imshow(matrix)
-	#pp.show()
+	pp.show()
 	matrix = matrix[200:607, 0:407]
 	pp.imshow(matrix)
-	#pp.show()
+	pp.show()
 	#pp.close("all")
 	mask = sector_mask(matrix.shape,(J22,J11,),71.225,(0,360))
 	matrix[~mask] = 125
@@ -116,7 +125,7 @@ def cutCirle():
 	matrix[newCoorinatex,newCoorinatey] = [254 , 50 ,50]
 	matrix[199,151] = [254 , 50 ,50]
 	pp.imshow(matrix)
-	#pp.show()
+	pp.show()
 	#pp.close("all")
 	disntance_array = []
 	angle_array = []
@@ -203,15 +212,20 @@ def cutCirle():
 		for values in range(360):
 			obstacleType = None			
 			for xy in range(len(xcoords)):
+				if(math.isinf(arrayOfObstacles[values]) == True):
+					obstacleType = 2
+					obstacleTypeArray.append(obstacleType)
+					break
 				#print(xy , len(xcoords))
+
 				
 
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-				if (assumedx[values] - (assumedx[values] * 0.04) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.04)):
+				if (assumedx[values] - (assumedx[values] * 0.01) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.01)):
 					indexxy = xy
 					#print(indexxy , xcoords[xy] , x )				
-					if (assumedy[values] - (assumedy[values] * 0.04)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.04)):
+					if (assumedy[values] - (assumedy[values] * 0.01)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.01)):
 						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
@@ -259,14 +273,28 @@ def cutCirle():
 	#print("wektor typow", len(obstacleTypeArray), obstacleTypeArray)
 	AnglesObstacles = list(range(1, 360))
 	#print("obstacle",arrayOfObstacles[5])
+	print("dlugosc" , len(assumedx))
 
 	rate = rospy.Rate(10)
 	obstacleType1 = [5,5,5]
-	array = [obstacleTypeArray, arrayOfObstacles[:360] , AnglesObstacles]
+	#array = [1, 1, 1]
+	print(obstacleTypeArray[182])
+	print("x",assumedx[182])
+	print("y",assumedy[182])
+	assx = int(assumedx[182])
+	assy = int(assumedy[182])
+	#matrix[assx,assy] = [60 , 254 ,50]
+	matrix[assy,assx] = [60 , 254 ,50]
+	pp.imshow(matrix)
+	pp.show()
+	array = [obstacleTypeArray, 1 , 1]
 	my_array_for_publishing = Int32MultiArray(data=array)	
 	#hello_str = obstacleType
 	rospy.loginfo(my_array_for_publishing)
 	pub.publish(my_array_for_publishing)
+	
+
+	#del arrayOfObstacles
 	#arrayOfObstacles = []
 
 
