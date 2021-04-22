@@ -52,7 +52,7 @@ def callback1(dt):
     for distance in range(len(dt.ranges)):
     	#print (distance)
     	arrayOfObstacles[distance] = dt.ranges[distance]
-    	angle = (math.radians(distance))
+    	angle = (math.radians(360 - distance))
     	#print ("kat",angle)
     	radius = dt.ranges[distance] * 20
     	#print (distance,dt.ranges[70])
@@ -222,10 +222,10 @@ def cutCirle():
 
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-				if (assumedx[values] - (assumedx[values] * 0.01) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.01)):
+				if (assumedx[values] - (assumedx[values] * 0.02) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.02)):
 					indexxy = xy
 					#print(indexxy , xcoords[xy] , x )				
-					if (assumedy[values] - (assumedy[values] * 0.01)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.01)):
+					if (assumedy[values] - (assumedy[values] * 0.02)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.02)):
 						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
@@ -278,15 +278,16 @@ def cutCirle():
 	rate = rospy.Rate(10)
 	obstacleType1 = [5,5,5]
 	#array = [1, 1, 1]
-	print(obstacleTypeArray[182])
-	print("x",assumedx[182])
-	print("y",assumedy[182])
-	assx = int(assumedx[182])
-	assy = int(assumedy[182])
+	print(obstacleTypeArray[250],arrayOfObstacles[250])
+	print("x",assumedx[250])
+	print("y",assumedy[250])
+	#assx = int(assumedx[250])
+	#assy = int(assumedy[250])
+
 	#matrix[assx,assy] = [60 , 254 ,50]
-	matrix[assy,assx] = [60 , 254 ,50]
-	pp.imshow(matrix)
-	pp.show()
+	#matrix[assy,assx] = [60 , 254 ,50]
+	#pp.imshow(matrix)
+	#pp.show()
 	array = [obstacleTypeArray, arrayOfObstacles , AnglesObstacles]
 	my_array_for_publishing = Int32MultiArray(data=array)	
 	#hello_str = obstacleType

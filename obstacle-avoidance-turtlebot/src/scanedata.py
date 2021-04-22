@@ -3,6 +3,7 @@ import rospy # Python library for ROS
 from sensor_msgs.msg import LaserScan # LaserScan type message is defined in sensor_msgs
 from geometry_msgs.msg import Twist #
 from nav_msgs.msg import Odometry
+import math
 
 closestObstacle = 0
 currentPosition = 0
@@ -13,21 +14,48 @@ def callback1(msg):
     #print(positionx , positiony)
         
 
-def callback(dt):   
+def callback(dt):  
+
+    sumOfObstacles = 0 
 
     print '-------------------------------------------'
-    print 'Closest obstacle:   {}'.format(min(dt.ranges))
-    #print 'Range data at 15 deg:  {}'.format(dt.ranges[15])
+    #print 'Closest obstacle:   {}'.format(min(dt.ranges))
+    print 'Range data at 15 deg:  {}'.format(dt.ranges[180])
     #print 'Range data at 345 deg: {}'.format(dt.ranges[345])
     print '-------------------------------------------'
-    global closestObstacle
-    print(dt.ranges , len(dt.ranges))
-    closestObstacle = min(dt.ranges)
-    closestObtacleAngle = dt.ranges.index(min(dt.ranges))
-    x = (383.5/2) + -(1) * ((383.5 - 0) / (10 - (-10)))
-    print(closestObstacle)
+    global closestObstacle   
+    """Yield successive n-sized chunks from lst."""
+    start = 0
+    k=0
+    end = 45
+    PointsForObstavles = []
+    for j in range(0,8):
+        for i in range(start, end):
+            #print i,k , start , end
+            if (math.isinf(dt.ranges[i]) == False ):
+                sumOfObstacles = 3.5 - dt.ranges[i]
+                sumOfObstacles = 3*(math.exp(sumOfObstacles))
+                sumOfObstacles += sumOfObstacles
+                #print sumOfObstacles
+            else:
+                sumOfObstacles += 0
+        
+        PointsForObstavles.append(sumOfObstacles)
+        sumOfObstacles = 0
+        k+=1
+        start = k * 45
+        end = start + 44
+        
+    
+
+    print PointsForObstavles
+       
+         
+    #print(dt.ranges , len(dt.ranges))
+   
+    #print(closestObstacle)
     #closestObstacle = (383.5/2) + -(closestObstacle) * ((383.5 - 0) / (10 - (-10)))
-    print(closestObstacle , closestObtacleAngle)
+    #print(closestObstacle , closestObtacleAngle)
     
 
     
