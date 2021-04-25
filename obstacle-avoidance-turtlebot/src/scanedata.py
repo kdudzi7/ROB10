@@ -33,10 +33,16 @@ def callback(dt):
         for i in range(start, end):
             #print i,k , start , end
             if (math.isinf(dt.ranges[i]) == False ):
-                sumOfObstacles = 3.5 - dt.ranges[i]
-                sumOfObstacles = 3*(math.exp(sumOfObstacles))
-                sumOfObstacles += sumOfObstacles
+                if(j == 0 or j == 8):
+                    sumOfObstacles = 3.5 - dt.ranges[i]
+                    sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+                    sumOfObstacles += sumOfObstacles
                 #print sumOfObstacles
+                else:
+                    sumOfObstacles = 3.5 - dt.ranges[i]
+                    sumOfObstacles = 3*(math.exp(sumOfObstacles))
+                    sumOfObstacles += sumOfObstacles
+
             else:
                 sumOfObstacles += 0
         

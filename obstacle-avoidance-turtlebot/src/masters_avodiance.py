@@ -22,8 +22,8 @@ from turtlebot3_master.msg import ScanData
 positionx = None
 positiony = None
 
-J11 = None
-J22 = None
+J11 = 0
+J22 = 0
 closestObstacle = 0
 currentPosition = 0
 closestObtacleAngle = 0
@@ -101,13 +101,13 @@ def callback(msg):
 
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
+	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
-	pp.imshow(matrix)
-	pp.show()
+	#pp.imshow(matrix)
+	#pp.show()
 	matrix = matrix[200:607, 0:407]
-	pp.imshow(matrix)
-	pp.show()
+	#pp.imshow(matrix)
+	#pp.show()
 	#pp.close("all")
 	mask = sector_mask(matrix.shape,(J22,J11,),71.225,(0,360))
 	matrix[~mask] = 125
@@ -124,8 +124,8 @@ def cutCirle():
 	newCoorinatey = int(J11)
 	matrix[newCoorinatex,newCoorinatey] = [254 , 50 ,50]
 	matrix[199,151] = [254 , 50 ,50]
-	pp.imshow(matrix)
-	pp.show()
+	#pp.imshow(matrix)
+	#pp.show()
 	#pp.close("all")
 	disntance_array = []
 	angle_array = []
