@@ -42,7 +42,7 @@ bool Turtlebot3Supervisor::init()
 
   // initialize publishers
   super_pub_ = nh_.advertise<turtlebot3_master::Super>("super_cmd", 10);
-  cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_velX", 10);
+  cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
     move_base_goal_pub_ = nh_.advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 10);
     move_base_goal_cancel_pub_ = nh_.advertise<actionlib_msgs::GoalID>("move_base/cancel", 10);
 
@@ -76,6 +76,14 @@ void Turtlebot3Supervisor::cmdVel2MsgCallBack(const geometry_msgs::Twist::ConstP
 {
     cmdVel2Msg_.linear.x = msg->linear.x;
     cmdVel2Msg_.angular.z = msg->angular.z;
+	if(cmdVel2Msg_.linear.x < 0.0)
+	{
+		drivingDirection = -1;
+	}
+	else if(cmdVel2Msg_.linear.x > 0.0)
+	{
+		drivingDirection = 1;
+	}
 }
 
 void Turtlebot3Supervisor::cmdVel3MsgCallBack(const geometry_msgs::Twist::ConstPtr &msg)
@@ -169,6 +177,104 @@ float Turtlebot3Supervisor::findMinDist(float startLeftAngle, float angle)
     return minRange;
 }
 
+void Turtlebot3Supervisor::calculateChunks(float startAngle)
+{
+	collectedChunk_ = 0.0;
+    for(int x = 0; x < 8; x++)
+    {
+		if(drivingDirection == 1)
+		{
+			chunkWeights[0] = 1.0;
+			chunkWeights[7] = 1.0;
+			chunkWeights[3] = 0.2;
+			chunkWeights[4] = 0.2;
+		}
+		else
+		{
+			chunkWeights[0] = 0.2;
+			chunkWeights[7] = 0.2;
+			chunkWeights[3] = 1.0;
+			chunkWeights[4] = 1.0;
+		}
+		chunkValues[x] = 0.0;
+        for(int i = 45 * x; i < 45 * (x+1); i++)
+        {
+			if(scanData[i][1] < 0.4)
+			{            
+				chunkValues[x] = chunkValues[x] + exp(exp(0.4 - scanData[i][1]));
+			}
+           // ROS_INFO("i %f", scanData[i][0]);
+        }
+		chunkValues[x] = chunkValues[x] * chunkWeights[x];
+		ROS_INFO("Sum between %i and %i deg = %f", (45*x), (45*(x+1)), chunkValues[x]);
+			collectedChunk_ = collectedChunk_ + chunkValues[x];
+    }
+	ROS_INFO("CHUNK SUM IS %f", collectedChunk_);
+	
+
+
+
+	float scanDataTurnedRight[360];
+	for(int i = 10; i < 360; i++)
+	{
+		scanDataTurnedRight[i] = scanData[i-10][1];
+	}
+	for(int j = 0; j < 10; j++)
+	{
+		scanDataTurnedRight[j] = scanData[360-10+j][1];
+	}
+	collectedChunkTurnedRight_ = 0.0;
+    for(int x = 0; x < 8; x++)
+    {
+		chunkValuesTurnedRight[x] = 0.0;
+        for(int i = 45 * x; i < 45 * (x+1); i++)
+        {
+			if(scanData[i][1] < 0.4)
+			{            
+				chunkValuesTurnedRight[x] = chunkValuesTurnedRight[x] + exp(exp(0.4 - scanDataTurnedRight[i]));
+			}
+           // ROS_INFO("i %f", scanData[i][0]);
+        }
+		chunkValuesTurnedRight[x] = chunkValuesTurnedRight[x] * chunkWeights[x];
+
+			collectedChunkTurnedRight_ = collectedChunkTurnedRight_ + chunkValuesTurnedRight[x];
+    }
+	ROS_INFO("CHUNK SUM TURNED RIGHT IS %f", collectedChunkTurnedRight_);
+	
+
+
+	float scanDataTurnedLeft[360];
+	for(int i = 0; i < 350; i++)
+	{
+		scanDataTurnedLeft[i] = scanData[i+10][1];
+	}
+	for(int j = 350; j < 360; j++)
+	{
+		scanDataTurnedLeft[j] = scanData[0+(j-350)][1];
+	}
+	collectedChunkTurnedLeft_ = 0.0;
+    for(int x = 0; x < 8; x++)
+    {
+		chunkValuesTurnedLeft[x] = 0.0;
+        for(int i = 45 * x; i < 45 * (x+1); i++)
+        {
+			if(scanData[i][1] < 0.4)
+			{            
+				chunkValuesTurnedLeft[x] = chunkValuesTurnedLeft[x] + exp(exp(0.4 - scanDataTurnedLeft[i]));
+			}
+           // ROS_INFO("i %f", scanData[i][0]);
+        }
+		chunkValuesTurnedLeft[x] = chunkValuesTurnedLeft[x] * chunkWeights[x];
+
+			collectedChunkTurnedLeft_ = collectedChunkTurnedLeft_ + chunkValuesTurnedLeft[x];
+    }
+	ROS_INFO("CHUNK SUM TURNED LEFT IS %f", collectedChunkTurnedLeft_);
+
+	
+
+
+}
+
 Quaternion Turtlebot3Supervisor::eulerToQuat(double yaw, double pitch, double roll)
 {
 
@@ -218,13 +324,65 @@ bool Turtlebot3Supervisor::controlLoop()
 {
     minRangeFront_ = findMinDist(45.0, 90.0);
     minRangeBack_ = findMinDist(135.0, 90.0);
+	calculateChunks(0.0);
+	float angularVelocity;
+	float linearVelocity;
+    float bufferSpeed; 
+
+	ROS_INFO("Driving direction %i", drivingDirection);
+
     switch(finiteStateMachineState_)
     {
+
+		case 9:
+            updateSuperCommand(0.22, 2.84);
+            ROS_INFO("SafeZone zone, FSM is %i", finiteStateMachineState_);
+
+			angularVelocity = abs(collectedChunk_ / 500) * 2.84;
+            bufferSpeed = slowSpeed_;
+            updateSuperCommand(slowSpeed_, 1.0);
+
+			if(collectedChunkTurnedLeft_ < collectedChunk_ && collectedChunkTurnedLeft_ < collectedChunkTurnedRight_)
+			{
+           		cmdVel3Msg_.linear.x = cmdVel2Msg_.linear.x;//drivingDirection* slowSpeed_;
+			    cmdVel3Msg_.angular.z = angularVelocity;
+				ROS_WARN("Turning left");
+			}
+			else if(collectedChunkTurnedRight_ < collectedChunk_ && collectedChunkTurnedRight_ < collectedChunkTurnedLeft_)
+			{
+           		cmdVel3Msg_.linear.x = cmdVel2Msg_.linear.x;//drivingDirection * slowSpeed_;
+			    cmdVel3Msg_.angular.z = -angularVelocity;
+				ROS_WARN("Turning right");
+			}
+			else if(collectedChunk_ < collectedChunkTurnedRight_ && collectedChunk_ < collectedChunkTurnedLeft_)
+			{
+           		cmdVel3Msg_.linear.x = 0.0;//cmdVel2Msg_.linear.x;//drivingDirection * slowSpeed_;
+			    cmdVel3Msg_.angular.z = 0.0;
+				ROS_WARN("Keeping Straight");
+			}
+
+            cmd_vel_pub_.publish(cmdVel3Msg_); 
+			if(collectedChunk_ < 1.0)
+			{
+                finiteStateMachineState_ = 9;
+			}
+            else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && (minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_))
+            {
+                finiteStateMachineState_ = 9;                
+            }
+			else
+			{
+                finiteStateMachineState_ = 9;				
+			}
+			break;
+
         case 1:
             updateSuperCommand(0.22, 2.84);
             goalSent = false;
             cmd_vel_pub_.publish(cmdVel2Msg_);
-            //ROS_INFO("Free Drive zone, FSM is %i", finiteStateMachineState_);
+
+
+            ROS_INFO("Free Drive zone, FSM is %i", finiteStateMachineState_);
 
         //Quaternion q;       
         //q = eulerToQuat(1.575,0.0,0.0);
@@ -239,6 +397,11 @@ bool Turtlebot3Supervisor::controlLoop()
         ROS_WARN("e.pitch %f", e.pitch);
         ROS_WARN("e.yaw %f", e.yaw);
 */
+
+			if(collectedChunk_ < 1.0)
+			{
+                finiteStateMachineState_ = 9;
+			}
             if(minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
             {
                 finiteStateMachineState_ = 1;
@@ -249,24 +412,24 @@ bool Turtlebot3Supervisor::controlLoop()
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
             {
-                finiteStateMachineState_ = 3;                
+                finiteStateMachineState_ = 9;                
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
             {
-                finiteStateMachineState_ = 4;
+                finiteStateMachineState_ = 9;
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
-                finiteStateMachineState_ = 5;
+                finiteStateMachineState_ = 1;
             }  
         break;
         case 2:
             {                
                 float speed1 = std::min(minRangeBack_,minRangeFront_);
-                float bufferSpeed = (((speed1 - safeZoneDist_) / (bufferZoneDist_ - safeZoneDist_)) * (maxSpeed_ - slowSpeed_) + slowSpeed_);
+                bufferSpeed = (((speed1 - safeZoneDist_) / (bufferZoneDist_ - safeZoneDist_)) * (maxSpeed_ - slowSpeed_) + slowSpeed_);
                 updateSuperCommand(bufferSpeed, 1.0);
                 cmd_vel_pub_.publish(cmdVel2Msg_);
-               // ROS_INFO("Buffer zone, FSM is %i", finiteStateMachineState_);
+                ROS_INFO("Buffer zone, FSM is %i", finiteStateMachineState_);
             }
 
             if(minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
@@ -279,15 +442,15 @@ bool Turtlebot3Supervisor::controlLoop()
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
             {
-                finiteStateMachineState_ = 3;                
+                finiteStateMachineState_ = 9;                
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
             {
-                finiteStateMachineState_ = 4;
+                finiteStateMachineState_ = 9;
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
-                finiteStateMachineState_ = 5;
+                finiteStateMachineState_ = 1;
             } 
         break;
         case 3:

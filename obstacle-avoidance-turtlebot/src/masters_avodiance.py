@@ -101,7 +101,7 @@ def callback(msg):
 
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
+	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	#pp.imshow(matrix)
 	#pp.show()

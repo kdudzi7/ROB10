@@ -111,14 +111,28 @@ class Turtlebot3Supervisor
 
     float maxSpeed_ = 0.22;
     float slowSpeed_ = 0.1;
-    float safeZoneDist_ = 0.3;
-    float bufferZoneDist_ = 0.5;
+    float safeZoneDist_ = 0.4;
+    float bufferZoneDist_ = 0.8;
     float minRangeFront_, minRangeBack_;
+	int drivingDirection = 0;
 
     float currentPositionX_;
     float currentPositionY_;
     float currentOrientationZ_;
     float currentOrientationW_;
+	
+	float chunkValues[8] = {};
+	float chunkWeights[8] = {1.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 1.0};
+	float collectedChunk_ = 0.0;
+
+	float chunkValuesTurnedLeft[8] = {};
+	float collectedChunkTurnedLeft_ = 0.0;
+
+	float chunkValuesTurnedRight[8] = {};
+	float collectedChunkTurnedRight_ = 0.0;
+
+	// 1=SafeMode 2=SemiAutonomy 3=FullAutonomy
+	int testCondition = 1;
 
     bool circlePressed_ = false;
 
@@ -131,6 +145,7 @@ class Turtlebot3Supervisor
 
   // Function prototypes
   float findMinDist(float startLeftAngle, float angle);
+  void calculateChunks(float startAngle);
   Quaternion eulerToQuat(double yaw, double pitch, double roll);
   EulerAngles ToEulerAngles(Quaternion q);
   void updateSuperCommand(float linearVelLimit, float angularVelLimit);
