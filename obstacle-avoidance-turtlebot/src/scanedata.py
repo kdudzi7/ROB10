@@ -26,9 +26,20 @@ def callback(dt):
     global closestObstacle   
     """Yield successive n-sized chunks from lst."""
     start = 0
+    startRight = 10
+    endRight = 55
+    startLeft = 35
+    endLeft = 80
     k=0
+    j=0
+    l=0
     end = 45
+    totalSumCurrent = 0
+    totalSumTurnLeft=0
+    totalSumTurnRight=0
     PointsForObstavles = []
+    PointsForObstavlesRight =[]
+    PointsForObstavlesLeft = []
     for j in range(0,8):
         for i in range(start, end):
             #print i,k , start , end
@@ -45,18 +56,99 @@ def callback(dt):
 
             else:
                 sumOfObstacles += 0
+                
         
         PointsForObstavles.append(sumOfObstacles)
+        totalSumCurrent += sumOfObstacles
         sumOfObstacles = 0
         k+=1
         start = k * 45
         end = start + 44
         
-    
+    #print totalSumCurrent
 
-    print PointsForObstavles
-       
-         
+    for j in range(0,7):
+        for i in range(startRight, endRight):
+            #print startRight , endRight
+            #print i,k , start , end
+            if (math.isinf(dt.ranges[i]) == False ):
+                if(j == 0):
+                    sumOfObstacles = 3.5 - dt.ranges[i]
+                    sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+                    sumOfObstacles += sumOfObstacles
+                #print sumOfObstacles
+                else:
+                    sumOfObstacles = 3.5 - dt.ranges[i]
+                    sumOfObstacles = 3*(math.exp(sumOfObstacles))
+                    sumOfObstacles += sumOfObstacles
+               
+            else:
+                sumOfObstacles += 0
+                
+        
+        PointsForObstavlesRight.append(sumOfObstacles)
+        totalSumTurnRight += sumOfObstacles
+        sumOfObstacles = 0
+        j+=1
+        startRight = 10 + (j * 45)
+        endRight = startRight + 44
+
+    for i in range(0,9):
+        sumOfObstacles = 3.5 - dt.ranges[i]
+        sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+        sumOfObstacles += sumOfObstacles
+    for i in range (325,359):
+        sumOfObstacles = 3.5 - dt.ranges[i]
+        sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+        sumOfObstacles += sumOfObstacles
+
+    PointsForObstavlesRight.append(sumOfObstacles)
+    totalSumTurnRight += sumOfObstacles
+
+
+
+    for j in range(0,7):
+        for i in range(startLeft, endLeft):
+            #print startRight , endRight
+            #print i,k , start , end
+            if (math.isinf(dt.ranges[i]) == False ):
+                if(j == 0):
+                    sumOfObstacles = 3.5 - dt.ranges[i]
+                    sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+                    sumOfObstacles += sumOfObstacles
+                #print sumOfObstacles
+                else:
+                    sumOfObstacles = 3.5 - dt.ranges[i]
+                    sumOfObstacles = 3*(math.exp(sumOfObstacles))
+                    sumOfObstacles += sumOfObstacles
+               
+            else:
+                sumOfObstacles += 0
+                
+        
+        PointsForObstavlesLeft.append(sumOfObstacles)
+        totalSumTurnLeft += sumOfObstacles
+        sumOfObstacles = 0
+        j+=1
+        startRight = 35 + (j * 45)
+        endRight = startRight + 44
+
+    for i in range(0,34):
+        sumOfObstacles = 3.5 - dt.ranges[i]
+        sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+        sumOfObstacles += sumOfObstacles
+    for i in range (349,359):
+        sumOfObstacles = 3.5 - dt.ranges[i]
+        sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+        sumOfObstacles += sumOfObstacles
+
+    PointsForObstavlesLeft.append(sumOfObstacles)
+    totalSumTurnRight += sumOfObstacles
+
+
+    print  totalSumCurrent, totalSumTurnRight , totalSumTurnLeft
+
+    
     #print(dt.ranges , len(dt.ranges))
    
     #print(closestObstacle)
@@ -69,11 +161,11 @@ def callback(dt):
 
     thr1 = 0.8 # Laser scan range threshold
     thr2 = 0.8
-    if dt.ranges[0]>thr1 and dt.ranges[15]>thr2 and dt.ranges[345]>thr2: # Checks if there are obstacles in front and
+    if totalSumTurnRight > totalSumTurnLeft : # Checks if there are obstacles in front and
                                                                          # 15 degrees left and right (Try changing the
 									 # the angle values as well as the thresholds)
-        move.linear.x = 0.0 # go forward (linear velocity)
-        move.angular.z = 0.0 # do not rotate (angular velocity)
+        move.linear.x = 0.1 # go forward (linear velocity)
+        move.angular.z = -0.2 # do not rotate (angular velocity)
     else:
         move.linear.x = 0.0 # stop
         move.angular.z = 0.0 # rotate counter-clockwise
