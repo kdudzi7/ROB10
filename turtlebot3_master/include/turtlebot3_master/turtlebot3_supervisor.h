@@ -111,8 +111,8 @@ class Turtlebot3Supervisor
 
     float maxSpeed_ = 0.22;
     float slowSpeed_ = 0.1;
-    float safeZoneDist_ = 0.2;
-    float bufferZoneDist_ = 0.4;
+    float safeZoneDist_ = 0.4;
+    float bufferZoneDist_ = 0.8;
     float minRangeFront_, minRangeBack_, minRange_;
 	int drivingDirection = 0;
 
