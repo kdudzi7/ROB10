@@ -4,10 +4,13 @@ from sensor_msgs.msg import LaserScan # LaserScan type message is defined in sen
 from geometry_msgs.msg import Twist #
 from nav_msgs.msg import Odometry
 import math
+import os
+from threading import Timer
 
 closestObstacle = 0
 currentPosition = 0
-
+maximum = 0
+currentmaximum = 0
 def callback1(msg):
     positionx =  msg.pose.pose.position.x
     positiony =  msg.pose.pose.position.y
@@ -23,7 +26,8 @@ def callback(dt):
     print 'Range data at 15 deg:  {}'.format(dt.ranges[180])
     #print 'Range data at 345 deg: {}'.format(dt.ranges[345])
     print '-------------------------------------------'
-    global closestObstacle   
+    global closestObstacle 
+    global maximum  
     """Yield successive n-sized chunks from lst."""
     start = 0
     startRight = 10
@@ -46,7 +50,7 @@ def callback(dt):
             if (math.isinf(dt.ranges[i]) == False ):
                 if(j == 0 or j == 8):
                     sumOfObstacles = 3.5 - dt.ranges[i]
-                    sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+                    sumOfObstacles = 4.5 * (math.exp(sumOfObstacles))
                     sumOfObstacles += sumOfObstacles
                 #print sumOfObstacles
                 else:
@@ -64,6 +68,7 @@ def callback(dt):
         k+=1
         start = k * 45
         end = start + 44
+        maximum = max(PointsForObstavles)
         
     #print totalSumCurrent
 
@@ -114,12 +119,12 @@ def callback(dt):
             if (math.isinf(dt.ranges[i]) == False ):
                 if(j == 0):
                     sumOfObstacles = 3.5 - dt.ranges[i]
-                    sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
+                    sumOfObstacles = 5 *(math.exp(sumOfObstacles))
                     sumOfObstacles += sumOfObstacles
                 #print sumOfObstacles
                 else:
                     sumOfObstacles = 3.5 - dt.ranges[i]
-                    sumOfObstacles = 3*(math.exp(sumOfObstacles))
+                    sumOfObstacles = 4.5*(math.exp(sumOfObstacles))
                     sumOfObstacles += sumOfObstacles
                
             else:
@@ -146,7 +151,11 @@ def callback(dt):
     totalSumTurnRight += sumOfObstacles
 
 
-    print  totalSumCurrent, totalSumTurnRight , totalSumTurnLeft
+    print  totalSumCurrent, PointsForObstavles, maximum
+
+    #beeping()
+    
+
 
     
     #print(dt.ranges , len(dt.ranges))
@@ -164,8 +173,8 @@ def callback(dt):
     if totalSumTurnRight > totalSumTurnLeft : # Checks if there are obstacles in front and
                                                                          # 15 degrees left and right (Try changing the
 									 # the angle values as well as the thresholds)
-        move.linear.x = 0.1 # go forward (linear velocity)
-        move.angular.z = -0.2 # do not rotate (angular velocity)
+        move.linear.x = 0.0 # go forward (linear velocity)
+        move.angular.z = 0.0 # do not rotate (angular velocity)
     else:
         move.linear.x = 0.0 # stop
         move.angular.z = 0.0 # rotate counter-clockwise
@@ -175,18 +184,43 @@ def callback(dt):
     pub.publish(move) # publish the move object
 
 
-move = Twist() # Creates a Twist message type object
-rospy.init_node('obstacle_avoidance_node') # Initializes a node
-pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)  # Publisher object which will publish "Twist" type messages
-                            				 # on the "/cmd_vel" Topic, "queue_size" is the size of the
-                                                         # outgoing message queue used for asynchronous publishing
+def beeping():
+    global currentmaximum
+    currentmaximum = maximum
+    if(maximum > 40):
+        
+        #frequency = 0.1 # Hertz
+        #duration  = 2000 # milliseconds
+        #threading.Timer(5.0, printit).start()
+        #print "Hello, World!"
+        beep()
+    Timer(0.5, beeping).start()
+def beep():
+    if(maximum > 40):
+        frequency = 0.1 # Hertz
+        duration  = 2000 # milliseconds
+        #threading.Timer(5.0, printit).start()
+        #print "Hello, World!"
+        print "\a"
+        frequency = 250 - currentmaximum
+        frequency = 2 * frequency  /  100
+        #print frequency
 
-sub = rospy.Subscriber("/scan", LaserScan, callback)
+    Timer(frequency, beep).start()
+
+if __name__ == '__main__':
+    move = Twist() # Creates a Twist message type object
+    rospy.init_node('obstacle_avoidance_node') # Initializes a node
+    pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)  # Publisher object which will publish "Twist" type messages
+                                				 # on the "/cmd_vel" Topic, "queue_size" is the size of the
+                                                             # outgoing message queue used for asynchronous publishing
+
+    sub = rospy.Subscriber("/scan", LaserScan, callback)
 
 
-odom_sub = rospy.Subscriber('/odom', Odometry, callback1)  # Subscriber object which will listen "LaserScan" type messages
-                                                      # from the "/scan" Topic and call the "callback" function
-						      # each time it reads something from the Topic
+    odom_sub = rospy.Subscriber('/odom', Odometry, callback1)  # Subscriber object which will listen "LaserScan" type messages
+    beeping()                                                     # from the "/scan" Topic and call the "callback" function
+    						      # each time it reads something from the Topic
 
-rospy.spin() # Loops infinitely until someone stops the program execution
+    rospy.spin() # Loops infinitely until someone stops the program execution
 
