@@ -111,9 +111,9 @@ class Turtlebot3Supervisor
 
     float maxSpeed_ = 0.22;
     float slowSpeed_ = 0.1;
-    float safeZoneDist_ = 0.4;
-    float bufferZoneDist_ = 0.8;
-    float minRangeFront_, minRangeBack_;
+    float safeZoneDist_ = 0.2;
+    float bufferZoneDist_ = 0.4;
+    float minRangeFront_, minRangeBack_, minRange_;
 	int drivingDirection = 0;
 
     float currentPositionX_;
@@ -122,7 +122,7 @@ class Turtlebot3Supervisor
     float currentOrientationW_;
 	
 	float chunkValues[8] = {};
-	float chunkWeights[8] = {1.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 1.0};
+	float chunkWeights[8] = {1.0, -0.1, -0.1, 0.2, 0.2, -0.1, -0.1, 1.0};
 	float collectedChunk_ = 0.0;
 
 	float chunkValuesTurnedLeft[8] = {};
