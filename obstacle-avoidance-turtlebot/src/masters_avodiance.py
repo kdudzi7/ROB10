@@ -21,7 +21,9 @@ from turtlebot3_master.msg import ScanData
 
 positionx = None
 positiony = None
+rotationz = 0
 
+start = False
 J11 = 0
 J22 = 0
 closestObstacle = 0
@@ -43,6 +45,8 @@ def callback1(dt):
     global arrayOfObstacles
     global assumedx
     global assumedy
+    global start  
+    alreadyClicked = 0
     #print(dt.ranges , len(dt.ranges))
     closestObstacle = min(dt.ranges)
     #print("90 odleglosc",dt.ranges[90])
@@ -52,15 +56,29 @@ def callback1(dt):
     for distance in range(len(dt.ranges)):
     	#print (distance)
     	arrayOfObstacles[distance] = dt.ranges[distance]
-    	angle = (math.radians(360 - distance))
+    	#print rotatio
+    	if (rotationz > 0.98):
+    		if(start == False and alreadyClicked ==0):
+    			start = True
+    			alreadyClicked = 1
+    		if(start == True and alreadyClicked == 0):
+    			start = False
+    			alreadyClicked = 1     		
+
+    	if start == False:
+    		angle = (math.radians(360 - distance + (145 * rotationz)))
+    	if start == True: 
+    		angle = (math.radians(360 - distance - (145 * rotationz)))  	
     	#print ("kat",angle)
     	radius = dt.ranges[distance] * 20
+    	#print start
     	#print (distance,dt.ranges[70])
     	#print (radius)
     	x = J11 + (radius * cos(angle))
     	y = J22 + (radius * sin(angle))      	
     	assumedx[distance] = x
     	assumedy[distance] = y
+    	#print start
     	#print("odleglosc", radius)
     	#arrayOfObstacles[distance] = dt.ranges[distance]
     #print(closestObstacle)
@@ -85,8 +103,12 @@ def callback(msg):
 	#print(msg.pose.pose.position.y)	
 	global positionx
 	global positiony
+	global rotationz
 	positionx =  msg.pose.pose.position.x
 	positiony =  msg.pose.pose.position.y
+   
+
+    
 
 	global J11
 	global J22
@@ -95,7 +117,9 @@ def callback(msg):
 	J11 = (407/2) + -(positionx) * ((407 - 0) / (10 - (-10)))
 	J11 = 407 - J11 
 
-	J22 = (407/2) + -(positiony) * ((407 -  0 )/ (10 - (-10))) 
+	J22 = (407/2) + -(positiony) * ((407 -  0 )/ (10 - (-10)))
+	rotationz =  msg.pose.pose.orientation.z
+	#print msg.pose.pose.orientation.z
 	#print(J11 , J22)
 	return J11 , J22 
 
@@ -222,10 +246,10 @@ def cutCirle():
 
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-				if (assumedx[values] - (assumedx[values] * 0.02) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.02)):
+				if (assumedx[values] - (assumedx[values] * 0.05) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.05)):
 					indexxy = xy
 					#print(indexxy , xcoords[xy] , x )				
-					if (assumedy[values] - (assumedy[values] * 0.02)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.02)):
+					if (assumedy[values] - (assumedy[values] * 0.05)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.05)):
 						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
@@ -278,17 +302,17 @@ def cutCirle():
 	rate = rospy.Rate(10)
 	obstacleType1 = [5,5,5]
 	#array = [1, 1, 1]
-	print(obstacleTypeArray[250],arrayOfObstacles[250])
-	print("x",assumedx[250])
-	print("y",assumedy[250])
-	#assx = int(assumedx[250])
-	#assy = int(assumedy[250])
+	#print(obstacleTypeArray[350],arrayOfObstacles[350])
+	#print("x",assumedx[350])
+	#print("y",assumedy[350])
+	#assx = int(assumedx[350])
+	#assy = int(assumedy[350])
 
 	#matrix[assx,assy] = [60 , 254 ,50]
 	#matrix[assy,assx] = [60 , 254 ,50]
 	#pp.imshow(matrix)
 	#pp.show()
-	array = [obstacleTypeArray, arrayOfObstacles , AnglesObstacles]
+	array = [1, 1 , 1]
 	#my_array_for_publishing = Int32MultiArray(data=array)	
 	scanDataMsg = ScanData()
 	scanDataMsg.angles = AnglesObstacles
