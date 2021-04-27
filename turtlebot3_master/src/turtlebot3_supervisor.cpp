@@ -182,12 +182,16 @@ void Turtlebot3Supervisor::calculateChunks(float startAngle)
 	collectedChunk_ = 0.0;
     for(int x = 0; x < 8; x++)
     {
-		if(drivingDirection == 1)
+		/*if(drivingDirection == 1)
 		{
 			chunkWeights[0] = 1.0;
 			chunkWeights[7] = 1.0;
+			chunkWeights[1] = -0.1;
+			chunkWeights[2] = 0.1;
 			chunkWeights[3] = 0.0;
 			chunkWeights[4] = 0.0;
+			chunkWeights[5] = -0.1;
+			chunkWeights[6] = 0.1;
 		}
 		else
 		{
@@ -195,7 +199,7 @@ void Turtlebot3Supervisor::calculateChunks(float startAngle)
 			chunkWeights[7] = 0.0;
 			chunkWeights[3] = 1.0;
 			chunkWeights[4] = 1.0;
-		}
+		}*/
 		chunkValues[x] = 0.0;
         for(int i = 45 * x; i < 45 * (x+1); i++)
         {
@@ -341,34 +345,58 @@ bool Turtlebot3Supervisor::controlLoop()
 		case 9:
             ROS_INFO("SafeZone zone, FSM is %i", finiteStateMachineState_);
 
-			angularVelocity = std::min((abs(collectedChunk_ / minRange_) * 2.84), 0.44);
+			angularVelocity = std::min((abs(collectedChunk_ / minRangeFront_) * 2.84), 0.24);
 			
+		ROS_WARN("CHUNK WEIGHTS 1 %f", chunkWeights[1]);
+		if(drivingDirection == 1 && chunkWeights[1] > 0.0)
+		{
+			chunkWeights[0] = 1.0;
+			chunkWeights[7] = 1.0;
+			chunkWeights[1] = -0.1;
+			chunkWeights[2] = 0.1;
+			chunkWeights[3] = 0.0;
+			chunkWeights[4] = 0.0;
+			chunkWeights[5] = -0.1;
+			chunkWeights[6] = 0.1;
+			ROS_WARN("A");
+		}
+		else
+		{
+			chunkWeights[0] = 1.0;
+			chunkWeights[7] = 1.0;
+			chunkWeights[1] = 0.1;
+			chunkWeights[2] = -0.1;
+			chunkWeights[3] = 0.0;
+			chunkWeights[4] = 0.0;
+			chunkWeights[5] = 0.1;
+			chunkWeights[6] = -0.1;
+			ROS_WARN("B");
+		}
 
-
-            updateSuperCommand(slowSpeed_, 1.0);
+            updateSuperCommand(0.04, 1.0);
 
 			if(abs(collectedChunkTurnedLeft_) < abs(collectedChunk_) && abs(collectedChunkTurnedLeft_) < abs(collectedChunkTurnedRight_))
 			{
-				cmdVel3Msg_.linear.x = 0.1	;//cmdVel2Msg_.linear.x;
+				cmdVel3Msg_.linear.x = 0.04;//cmdVel2Msg_.linear.x;
 			    cmdVel3Msg_.angular.z = angularVelocity;
 				ROS_WARN("Turning left");
 			}
 			else if(abs(collectedChunkTurnedRight_) < abs(collectedChunk_) && abs(collectedChunkTurnedRight_) < abs(collectedChunkTurnedLeft_))
 			{
-				cmdVel3Msg_.linear.x = 0.1;//cmdVel2Msg_.linear.x;
+				cmdVel3Msg_.linear.x = 0.04;//cmdVel2Msg_.linear.x;
 			    cmdVel3Msg_.angular.z = -angularVelocity;
 				ROS_WARN("Turning right");
 			}
 			else if(abs(collectedChunk_) < abs(collectedChunkTurnedRight_) && abs(collectedChunk_) < abs(collectedChunkTurnedLeft_))
 			{
-				cmdVel3Msg_.linear.x = 0.1;//cmdVel2Msg_.linear.x;
+				cmdVel3Msg_.linear.x = 0.04;//cmdVel2Msg_.linear.x;
 			    cmdVel3Msg_.angular.z = 0.0;
 				ROS_WARN("Keeping Straight");
 			}
-			else if(abs(collectedChunk_) == 0.0)
+			/*else if(abs(collectedChunk_) == 0.0)
 			{
 				cmdVel3Msg_.linear.x = 0.1;//cmdVel2Msg_.linear.x;
-			}
+			}*/
 
 
        		/*if(drivingDirection == 1)
@@ -386,9 +414,9 @@ bool Turtlebot3Supervisor::controlLoop()
 
 			cmd_vel_pub_.publish(cmdVel3Msg_); 
 
-            if(collectedChunk_ <= 1.0 )//&& collectedChunk_ >= -1.0)
+            if(collectedChunk_ <= 0.01 && collectedChunk_ >= -0.01)
             {
-                finiteStateMachineState_ = 9;
+                finiteStateMachineState_ = 1;
             }
             /*else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_)
             {

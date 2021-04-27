@@ -122,7 +122,7 @@ class Turtlebot3Supervisor
     float currentOrientationW_;
 	
 	float chunkValues[8] = {};
-	float chunkWeights[8] = {1.0, -0.1, -0.1, 0.2, 0.2, -0.1, -0.1, 1.0};
+	float chunkWeights[8] = {1.0, -0.1, -0.0, 0.2, 0.2, -0.1, -0.0, 1.0};
 	float collectedChunk_ = 0.0;
 
 	float chunkValuesTurnedLeft[8] = {};
