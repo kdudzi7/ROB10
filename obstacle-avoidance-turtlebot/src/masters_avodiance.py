@@ -22,7 +22,7 @@ from turtlebot3_master.msg import ScanData
 positionx = None
 positiony = None
 rotationz = 0
-
+alreadyClicked = 0
 start = False
 J11 = 0
 J22 = 0
@@ -45,8 +45,10 @@ def callback1(dt):
     global arrayOfObstacles
     global assumedx
     global assumedy
-    global start  
-    alreadyClicked = 0
+    global start
+    global alreadyClicked  
+    #alreadyClicked = 0
+    #print start, alreadyClicked
     #print(dt.ranges , len(dt.ranges))
     closestObstacle = min(dt.ranges)
     #print("90 odleglosc",dt.ranges[90])
@@ -56,19 +58,22 @@ def callback1(dt):
     for distance in range(len(dt.ranges)):
     	#print (distance)
     	arrayOfObstacles[distance] = dt.ranges[distance]
-    	#print rotatio
-    	if (rotationz > 0.98):
-    		if(start == False and alreadyClicked ==0):
+    	#print rotationz
+    	if (rotationz >  0.98 or rotationz < -0.98):    		
+    		if(start == False and alreadyClicked == 0):
     			start = True
     			alreadyClicked = 1
+
     		if(start == True and alreadyClicked == 0):
     			start = False
-    			alreadyClicked = 1     		
+    			alreadyClicked = 1
+    		   		
 
     	if start == False:
-    		angle = (math.radians(360 - distance + (145 * rotationz)))
+    		angle = (math.radians(360 - distance + (150 * rotationz)))
     	if start == True: 
-    		angle = (math.radians(360 - distance - (145 * rotationz)))  	
+    		angle = (math.radians(360 - distance - (150 * rotationz)))
+    	 	
     	#print ("kat",angle)
     	radius = dt.ranges[distance] * 20
     	#print start
@@ -95,7 +100,11 @@ def callback1(dt):
     	assumedx =[]
     	assumedy =[]
 
-
+def changeTozero():
+	global alreadyClicked
+	print alreadyClicked
+	alreadyClicked = 0
+	Timer(1, changeTozero).start()
 
 
 def callback(msg):
@@ -125,7 +134,7 @@ def callback(msg):
 
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
+	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	#pp.imshow(matrix)
 	#pp.show()
@@ -246,10 +255,10 @@ def cutCirle():
 
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-				if (assumedx[values] - (assumedx[values] * 0.05) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.05)):
+				if (assumedx[values] - (assumedx[values] * 0.04) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.04)):
 					indexxy = xy
 					#print(indexxy , xcoords[xy] , x )				
-					if (assumedy[values] - (assumedy[values] * 0.05)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.05)):
+					if (assumedy[values] - (assumedy[values] * 0.04)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.04)):
 						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
@@ -302,11 +311,11 @@ def cutCirle():
 	rate = rospy.Rate(10)
 	obstacleType1 = [5,5,5]
 	#array = [1, 1, 1]
-	#print(obstacleTypeArray[350],arrayOfObstacles[350])
-	#print("x",assumedx[350])
-	#print("y",assumedy[350])
-	#assx = int(assumedx[350])
-	#assy = int(assumedy[350])
+	#print(obstacleTypeArray[1],arrayOfObstacles[1])
+	#print("x",assumedx[1])
+	#print("y",assumedy[1])
+	#assx = int(assumedx[1])
+	#assy = int(assumedy[1])
 
 	#matrix[assx,assy] = [60 , 254 ,50]
 	#matrix[assy,assx] = [60 , 254 ,50]
@@ -329,6 +338,7 @@ def cutCirle():
 
 
 	Timer(1, cutCirle).start()
+
 	#return obstacleType
 	#pp.close()
 
@@ -409,6 +419,7 @@ def talker():
 
 
 if __name__ == '__main__':
+	#start = False
 	rospy.init_node('ObstacleType')
 	pub = rospy.Publisher("scan_eval", ScanData, queue_size=10)
 	odom_sub = rospy.Subscriber('/odom', Odometry, callback)
@@ -462,6 +473,7 @@ if __name__ == '__main__':
 
 	print("positionx", positionx)
 	cutCirle()
+	changeTozero()
 	#a = IntList()
 	#a.data = [typeOfObstacle,distance,angle]
 	point_on_circle()
