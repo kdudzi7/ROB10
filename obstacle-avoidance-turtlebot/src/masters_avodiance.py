@@ -70,9 +70,9 @@ def callback1(dt):
     		   		
 
     	if start == False:
-    		angle = (math.radians(360 - distance + (150 * rotationz)))
+    		angle = (math.radians(360 - distance + (145 * rotationz)))
     	if start == True: 
-    		angle = (math.radians(360 - distance - (150 * rotationz)))
+    		angle = (math.radians(360 - distance - (145 * rotationz)))
     	 	
     	#print ("kat",angle)
     	radius = dt.ranges[distance] * 20
@@ -311,11 +311,11 @@ def cutCirle():
 	rate = rospy.Rate(10)
 	obstacleType1 = [5,5,5]
 	#array = [1, 1, 1]
-	#print(obstacleTypeArray[1],arrayOfObstacles[1])
-	#print("x",assumedx[1])
-	#print("y",assumedy[1])
-	#assx = int(assumedx[1])
-	#assy = int(assumedy[1])
+	#print(obstacleTypeArray[39],arrayOfObstacles[39])
+	#print("x",assumedx[39])
+	#print("y",assumedy[39])
+	#assx = int(assumedx[39])
+	#assy = int(assumedy[39])
 
 	#matrix[assx,assy] = [60 , 254 ,50]
 	#matrix[assy,assx] = [60 , 254 ,50]

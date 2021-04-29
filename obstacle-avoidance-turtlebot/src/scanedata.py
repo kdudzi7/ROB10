@@ -6,11 +6,20 @@ from nav_msgs.msg import Odometry
 import math
 import os
 from threading import Timer
+import pyaudio
+import pygame
+
+
 
 closestObstacle = 0
 currentPosition = 0
 maximum = 0
 currentmaximum = 0
+frequency = 0 
+distances = list(range(0, 90))
+direction = 0
+valueOfBeep = 0
+
 def callback1(msg):
     positionx =  msg.pose.pose.position.x
     positiony =  msg.pose.pose.position.y
@@ -21,14 +30,38 @@ def callback(dt):
 
     sumOfObstacles = 0 
 
-    print '-------------------------------------------'
+    #print '-------------------------------------------'
     #print 'Closest obstacle:   {}'.format(min(dt.ranges))
-    print 'Range data at 15 deg:  {}'.format(dt.ranges[180])
+    #print 'Range data at 15 deg:  {}'.format(dt.ranges[180])
     #print 'Range data at 345 deg: {}'.format(dt.ranges[345])
-    print '-------------------------------------------'
+    #print '-------------------------------------------'
     global closestObstacle 
     global maximum  
+    global frequency
+    global direction
+    global valueOfBeep
     """Yield successive n-sized chunks from lst."""
+    for i in range(0,45):       
+        distances[i] = dt.ranges[315 + i]
+
+
+    for i in range(46,90):        
+        distances[i] = dt.ranges[i - 45]
+
+    minimum = min(distances)
+    #print minimum , distances , dt.ranges[316]
+    frequency =  minimum
+    index = distances.index(frequency)
+    print index
+    if(45 - index > 0):
+        print "right"
+        valueOfBeep = index * 0.02
+
+        direction = 1
+    if (45 - index <= 0):
+        print "left"
+        direction = 2
+        valueOfBeep = (index - 45) * 0.02
     start = 0
     startRight = 10
     endRight = 55
@@ -68,7 +101,7 @@ def callback(dt):
         k+=1
         start = k * 45
         end = start + 44
-        maximum = max(PointsForObstavles)
+        maximum = frequency
         
     #print totalSumCurrent
 
@@ -151,15 +184,9 @@ def callback(dt):
     totalSumTurnRight += sumOfObstacles
 
 
-    print  totalSumCurrent, PointsForObstavles, maximum
-
-    #beeping()
-    
-
-
-    
-    #print(dt.ranges , len(dt.ranges))
-   
+    #print  totalSumCurrent, PointsForObstavles, maximum
+    #beeping()     
+    #print(dt.ranges , len(dt.ranges))   
     #print(closestObstacle)
     #closestObstacle = (383.5/2) + -(closestObstacle) * ((383.5 - 0) / (10 - (-10)))
     #print(closestObstacle , closestObtacleAngle)
@@ -185,28 +212,46 @@ def callback(dt):
 
 
 def beeping():
-    global currentmaximum
-    currentmaximum = maximum
-    if(maximum > 40):
+    global currentfrequency
+    currentfrequency = frequency
+    if(frequency < 1.5):
         
         #frequency = 0.1 # Hertz
         #duration  = 2000 # milliseconds
         #threading.Timer(5.0, printit).start()
         #print "Hello, World!"
         beep()
-    Timer(0.5, beeping).start()
+    Timer(0.1, beeping).start()
 def beep():
-    if(maximum > 40):
-        frequency = 0.1 # Hertz
-        duration  = 2000 # milliseconds
+    currentDirection = 0
+    if (frequency > 1.5):
+        Timer(0.001, beep).start()
+    if(frequency <= 1.5):
+        #frequency = 0.1 # Hertz
+        #duration  = 2000 # milliseconds
         #threading.Timer(5.0, printit).start()
         #print "Hello, World!"
-        print "\a"
-        frequency = 250 - currentmaximum
-        frequency = 2 * frequency  /  100
+        #print "\a"
+        newFrequency = 3.5 - frequency
+        #print newFrequency
+        newFrequency =  2 * math.exp(newFrequency)/100
+        newFrequency = 0.65 - newFrequency
+        print direction
+        currentDirection = direction
+        curentBeepingValue = valueOfBeep
+        pygame.init()
+        sound0 = pygame.mixer.Sound('/home/harumanager/catkin_ws/src/ROB10/sounds/beep-07.wav')
+        if(currentDirection == 1):
+            channel0 = pygame.mixer.Channel(0)
+            channel0.play(sound0)
+            channel0.set_volume(curentBeepingValue, 1 - curentBeepingValue)
+        if(currentDirection == 2):
+            channel0 = pygame.mixer.Channel(0)
+            channel0.play(sound0)
+            channel0.set_volume(1 - curentBeepingValue, curentBeepingValue)
+        #print newFrequency
         #print frequency
-
-    Timer(frequency, beep).start()
+        Timer(newFrequency, beep).start()
 
 if __name__ == '__main__':
     move = Twist() # Creates a Twist message type object
@@ -219,7 +264,7 @@ if __name__ == '__main__':
 
 
     odom_sub = rospy.Subscriber('/odom', Odometry, callback1)  # Subscriber object which will listen "LaserScan" type messages
-    beeping()                                                     # from the "/scan" Topic and call the "callback" function
+    beep()                                                     # from the "/scan" Topic and call the "callback" function
     						      # each time it reads something from the Topic
 
     rospy.spin() # Loops infinitely until someone stops the program execution
