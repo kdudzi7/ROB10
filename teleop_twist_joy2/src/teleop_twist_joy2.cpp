@@ -170,6 +170,8 @@ void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_m
   {
     cmd_vel_msg.linear.x = -1 * linearVelLimit;
   }
+
+
   if(cmd_vel_msg.angular.z > angularVelLimit)
   {
     cmd_vel_msg.angular.z = angularVelLimit;

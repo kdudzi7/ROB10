@@ -56,10 +56,10 @@ def callback1(dt):
     closestObtacleAngle = dt.ranges.index(min(dt.ranges))
     x = (407/2) + -(1) * ((407 - 0) / (10 - (-10)))
     for distance in range(len(dt.ranges)):
-    	#print (distance)
+    	#print (distance , start)
     	arrayOfObstacles[distance] = dt.ranges[distance]
     	#print rotationz
-    	if (rotationz >  0.98 or rotationz < -0.98):    		
+    	if (rotationz > 0.995 or rotationz < -0.995):    		
     		if(start == False and alreadyClicked == 0):
     			start = True
     			alreadyClicked = 1
@@ -67,12 +67,12 @@ def callback1(dt):
     		if(start == True and alreadyClicked == 0):
     			start = False
     			alreadyClicked = 1
-    		   		
+
 
     	if start == False:
-    		angle = (math.radians(360 - distance + (145 * rotationz)))
-    	if start == True: 
     		angle = (math.radians(360 - distance - (145 * rotationz)))
+    	if start == True: 
+    		angle = (math.radians(360 - distance + (145 * rotationz)))
     	 	
     	#print ("kat",angle)
     	radius = dt.ranges[distance] * 20
@@ -104,7 +104,7 @@ def changeTozero():
 	global alreadyClicked
 	print alreadyClicked
 	alreadyClicked = 0
-	Timer(1, changeTozero).start()
+	Timer(0.5, changeTozero).start()
 
 
 def callback(msg):
@@ -134,7 +134,7 @@ def callback(msg):
 
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
+	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	#pp.imshow(matrix)
 	#pp.show()
@@ -151,8 +151,8 @@ def cutCirle():
 	obstacleDistance =  closestObstacle
 	obstacleAngle = closestObtacleAngle
 
-	print('Number of white pixels:', number_of_white_pix)
-	print('Number of black pixels:', number_of_black_pix)
+	#print('Number of white pixels:', number_of_white_pix)
+	#print('Number of black pixels:', number_of_black_pix)
 	newCoorinatex = int(J22)
 	newCoorinatey = int(J11)
 	matrix[newCoorinatex,newCoorinatey] = [254 , 50 ,50]
@@ -163,7 +163,7 @@ def cutCirle():
 	disntance_array = []
 	angle_array = []
 	if(number_of_black_pix > 0):
-		print('There is an obstacle')
+		#print('There is an obstacle')
 		ycoords, xcoords = np.where((n[:, :, 0:3] == [0,0,0]).all(2))
 		#xcoords = (383.5/2) + -(xcoords) * ((383.5 - 0) / (10 - (-10)))
 		#xcoords = 383.5 - xcoords
@@ -233,7 +233,7 @@ def cutCirle():
 		smallest_distance = min(disntance_array)
 		mallest_angle_index = disntance_array.index(min(disntance_array))
 		angle_of_the_smallest_distance = angle_array[mallest_angle_index]		
-		print("distance" ,smallest_distance , mallest_angle_index , len(disntance_array) , len(angle_array), xcoords[mallest_angle_index] , ycoords[mallest_angle_index] , angle_of_the_smallest_distance)
+		#print("distance" ,smallest_distance , mallest_angle_index , len(disntance_array) , len(angle_array), xcoords[mallest_angle_index] , ycoords[mallest_angle_index] , angle_of_the_smallest_distance)
 		x_on_map = xcoords[mallest_angle_index] 
 		y_on_map = ycoords[mallest_angle_index]
 
@@ -255,10 +255,10 @@ def cutCirle():
 
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-				if (assumedx[values] - (assumedx[values] * 0.04) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.04)):
+				if (assumedx[values] - (assumedx[values] * 0.05) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.05)):
 					indexxy = xy
 					#print(indexxy , xcoords[xy] , x )				
-					if (assumedy[values] - (assumedy[values] * 0.04)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.04)):
+					if (assumedy[values] - (assumedy[values] * 0.05)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.05)):
 						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
@@ -306,16 +306,16 @@ def cutCirle():
 	#print("wektor typow", len(obstacleTypeArray), obstacleTypeArray)
 	AnglesObstacles = list(range(1, 360))
 	#print("obstacle",arrayOfObstacles[5])
-	print("dlugosc" , len(assumedx))
+	#print("dlugosc" , len(assumedx))
 
 	rate = rospy.Rate(10)
 	obstacleType1 = [5,5,5]
 	#array = [1, 1, 1]
-	#print(obstacleTypeArray[39],arrayOfObstacles[39])
-	#print("x",assumedx[39])
-	#print("y",assumedy[39])
-	#assx = int(assumedx[39])
-	#assy = int(assumedy[39])
+	#print(obstacleTypeArray[10],arrayOfObstacles[10])
+	#print("x",assumedx[10])
+	#print("y",assumedy[10])
+	#assx = int(assumedx[10])
+	#assy = int(assumedy[10])
 
 	#matrix[assx,assy] = [60 , 254 ,50]
 	#matrix[assy,assx] = [60 , 254 ,50]
@@ -330,14 +330,13 @@ def cutCirle():
 	#hello_str = obstacleType
 	rospy.loginfo(scanDataMsg)
 	pub.publish(scanDataMsg)
-	print("HAAAAAAAAAAAAAAALLLLLLLLLLLOOOOOOOOOOOOOOOOOO")
-
+	
 	#del arrayOfObstacles
 	#arrayOfObstacles = []
 
 
 
-	Timer(1, cutCirle).start()
+	Timer(0.01, cutCirle).start()
 
 	#return obstacleType
 	#pp.close()

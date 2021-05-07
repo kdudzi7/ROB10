@@ -33,7 +33,7 @@
             <pose frame=''>0.0 -10.0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>20.0 0.05 0.01</size>
+              <size>20.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -69,7 +69,7 @@
             <pose frame=''>0.0 10.0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>20.0 0.05 0.01</size>
+              <size>20.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -105,7 +105,7 @@
             <pose frame=''>10.0 0.0 0 0 -0 -1.57079632679</pose>
           <geometry>
             <box>
-              <size>20.0 0.05 0.01</size>
+              <size>20.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -120,7 +120,7 @@
             <pose>-10.0 0.0 0 0 -0 -1.57079632679</pose>
           <geometry>
             <box>
-              <size>20.0 0.05 0.01</size>
+              <size>20.0 0.05 2.5</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -141,7 +141,7 @@
             <pose frame=''>-10.0 0.0 0 0 -0 -1.57079632679</pose>
           <geometry>
             <box>
-              <size>20.0 0.05 0.01</size>
+              <size>20.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -179,7 +179,7 @@
             <pose>8.0 8.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -189,34 +189,6 @@
             </script>
           </material>
         </visual>
-
-
-
-<!-- <collision name='Wall_2_Collision'>
-            <pose>6.0 9.0 0 0 -0 -1.5707</pose>
-          <geometry>
-            <box>
-              <size>2.0 0.05 2.5</size>
-            </box>
-          </geometry>
-          <max_contacts>10</max_contacts>
-        <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision> -->
-
-
-
-
 
         <collision name='Wall_2_Collision'>
             <pose>6.0 7.0 0 0 -0 -1.5707</pose>
@@ -243,7 +215,7 @@
             <pose>6.0 7.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -279,7 +251,7 @@
             <pose>6.0 3.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -315,7 +287,7 @@
             <pose>8.0 2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -351,7 +323,7 @@
             <pose>6.0 -3.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>6.0 0.05 0.01</size>
+              <size>6.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -387,7 +359,7 @@
             <pose>9.0 -3.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -423,7 +395,7 @@
             <pose>8.0 -4.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -460,7 +432,7 @@
             <pose>9.0 -5.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -496,7 +468,7 @@
             <pose>8.0 -6.5 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>1.0 0.05 0.01</size>
+              <size>1.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -532,7 +504,7 @@
             <pose>9.0 -7.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -568,7 +540,7 @@
             <pose>6.0 -9.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -604,7 +576,7 @@
             <pose>4.0 8.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -640,7 +612,7 @@
             <pose>3.0 6.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -676,7 +648,7 @@
             <pose>0.0 8.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -712,7 +684,7 @@
             <pose>-2.0 6.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -748,7 +720,7 @@
             <pose>-3.0 8.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -784,7 +756,7 @@
             <pose>-4.0 8.5 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>1.0 0.05 0.01</size>
+              <size>1.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -820,7 +792,7 @@
             <pose>-6.0 9.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -856,7 +828,7 @@
             <pose>-8.0 6.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -892,7 +864,7 @@
             <pose>-9.0 4.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -928,7 +900,7 @@
             <pose>-3.5 4.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>5.0 0.05 0.01</size>
+              <size>5.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -964,7 +936,7 @@
             <pose>2 4.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1000,7 +972,7 @@
             <pose>4.0 1 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>6.0 0.05 0.01</size>
+              <size>6.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1036,7 +1008,7 @@
             <pose>-1.0 1.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1072,7 +1044,7 @@
             <pose>-3.0 2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1108,7 +1080,7 @@
             <pose>-3.0 0.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1144,7 +1116,7 @@
             <pose>-5.0 1.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1180,7 +1152,7 @@
             <pose>-7.0 1.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1216,7 +1188,7 @@
             <pose>-8.5 2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>3.0 0.05 0.01</size>
+              <size>3.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1252,7 +1224,7 @@
             <pose>-7.5 2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>1.0 0.05 0.01</size>
+              <size>1.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1288,7 +1260,7 @@
             <pose>-9.0 -2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1324,7 +1296,7 @@
             <pose>-8.0 -3.5 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>3.0 0.05 0.01</size>
+              <size>3.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1360,7 +1332,7 @@
             <pose>-6.0 -3.5 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>3.0 0.05 0.01</size>
+              <size>3.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1396,7 +1368,7 @@
             <pose>-5.0 -5.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1432,7 +1404,7 @@
             <pose>-4.0 -3.5 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>3.0 0.05 0.01</size>
+              <size>3.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1468,7 +1440,7 @@
             <pose>-3.5 -2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>5.0 0.05 0.01</size>
+              <size>5.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1504,7 +1476,7 @@
             <pose>2.0 -2.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1540,7 +1512,7 @@
             <pose>-0.0 -3.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1576,7 +1548,7 @@
             <pose>2.0 -4.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1612,7 +1584,7 @@
             <pose>4.0 -3.5 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>1.0 0.05 0.01</size>
+              <size>1.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1648,7 +1620,7 @@
             <pose>4.0 -8.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1684,7 +1656,7 @@
             <pose>2.5 -9.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>3.0 0.05 0.01</size>
+              <size>3.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1720,7 +1692,7 @@
             <pose>2.0 -7.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>4.0 0.05 0.01</size>
+              <size>4.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1756,7 +1728,7 @@
             <pose>-3.5 -7.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>3.0 0.05 0.01</size>
+              <size>3.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1792,7 +1764,7 @@
             <pose>-5.0 -8.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1828,7 +1800,7 @@
             <pose>-5.5 -9.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>1.0 0.05 0.01</size>
+              <size>1.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1864,7 +1836,7 @@
             <pose>-6.0 -8.0 0 0 -0 -1.5707</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>
@@ -1900,7 +1872,7 @@
             <pose>-7.0 -7.0 0 0 -0 -0</pose>
           <geometry>
             <box>
-              <size>2.0 0.05 0.01</size>
+              <size>2.0 0.05 2.5</size>
             </box>
           </geometry>
           <material>

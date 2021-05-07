@@ -16,9 +16,12 @@ currentPosition = 0
 maximum = 0
 currentmaximum = 0
 frequency = 0 
-distances = list(range(0, 90))
 direction = 0
 valueOfBeep = 0
+Forward = 1
+
+def _del_(self):
+	print('Destroyed')
 
 def callback1(msg):
     positionx =  msg.pose.pose.position.x
@@ -26,10 +29,12 @@ def callback1(msg):
     #print(positionx , positiony)
         
 
-def callback(dt):  
-
+def callback(dt): 
+    distances = list(range(0, 90)) 
+    Forward = rospy.get_param("/drivingDirection")
+    isDriving = rospy.get_param("/ps3LinVel")
     sumOfObstacles = 0 
-
+    print(isDriving)
     #print '-------------------------------------------'
     #print 'Closest obstacle:   {}'.format(min(dt.ranges))
     #print 'Range data at 15 deg:  {}'.format(dt.ranges[180])
@@ -41,27 +46,47 @@ def callback(dt):
     global direction
     global valueOfBeep
     """Yield successive n-sized chunks from lst."""
-    for i in range(0,45):       
-        distances[i] = dt.ranges[315 + i]
+    if (Forward == 1 or isDriving == 0.0):
+        for i in range(0,45):       
+            distances[i] = dt.ranges[315 + i]
 
 
-    for i in range(46,90):        
-        distances[i] = dt.ranges[i - 45]
+        for i in range(46,90):        
+            distances[i] = dt.ranges[i - 45]
+
+    if (Forward == -1 and isDriving != 0.0):
+        for i in range(135, 224):  
+            indexBack = abs(135 - i) 
+            distances[indexBack] = dt.ranges[i]
+
 
     minimum = min(distances)
     #print minimum , distances , dt.ranges[316]
+    frequency = 3.5
     frequency =  minimum
+    print(frequency)
     index = distances.index(frequency)
     print index
-    if(45 - index > 0):
-        print "right"
-        valueOfBeep = index * 0.02
-
-        direction = 1
-    if (45 - index <= 0):
-        print "left"
-        direction = 2
-        valueOfBeep = (index - 45) * 0.02
+    if(Forward == 1 or isDriving == 0.0):
+        print("ForwardDriving")
+        if(45- index > 0):
+            print ("right",index)
+            valueOfBeep = index * 0.02
+            direction = 1
+        if (45 - index <= 0):
+            print ("left",index)
+            direction = 2
+            valueOfBeep = abs(index - 90) * 0.02
+    if(Forward == -1 and isDriving != 0.0):
+        print("BackwardDriving")
+        if(45 - index > 0):
+            print "right"
+            valueOfBeep = index * 0.02
+            direction = 2
+        if (45 - index <= 0):
+            print "left"
+            direction = 1
+            valueOfBeep = abs(index - 90) * 0.02
     start = 0
     startRight = 10
     endRight = 55
@@ -214,7 +239,7 @@ def callback(dt):
 def beeping():
     global currentfrequency
     currentfrequency = frequency
-    if(frequency < 1.5):
+    if(frequency < 0.6):
         
         #frequency = 0.1 # Hertz
         #duration  = 2000 # milliseconds
@@ -224,9 +249,9 @@ def beeping():
     Timer(0.1, beeping).start()
 def beep():
     currentDirection = 0
-    if (frequency > 1.5):
+    if (frequency > 0.6):
         Timer(0.001, beep).start()
-    if(frequency <= 1.5):
+    if(frequency <= 0.6):
         #frequency = 0.1 # Hertz
         #duration  = 2000 # milliseconds
         #threading.Timer(5.0, printit).start()
@@ -236,36 +261,42 @@ def beep():
         #print newFrequency
         newFrequency =  2 * math.exp(newFrequency)/100
         newFrequency = 0.65 - newFrequency
-        print direction
+        #print direction
         currentDirection = direction
         curentBeepingValue = valueOfBeep
         pygame.init()
-        sound0 = pygame.mixer.Sound('/home/harumanager/catkin_ws/src/ROB10/sounds/beep-07.wav')
+        sound0 = pygame.mixer.Sound('/home/harumanager/catkin_ws/src/sounds/beep-07.wav')
         if(currentDirection == 1):
             channel0 = pygame.mixer.Channel(0)
             channel0.play(sound0)
             channel0.set_volume(curentBeepingValue, 1 - curentBeepingValue)
+            #print curentBeepingValue
         if(currentDirection == 2):
             channel0 = pygame.mixer.Channel(0)
             channel0.play(sound0)
             channel0.set_volume(1 - curentBeepingValue, curentBeepingValue)
+            #print curentBeepingValue
         #print newFrequency
         #print frequency
         Timer(newFrequency, beep).start()
 
 if __name__ == '__main__':
-    move = Twist() # Creates a Twist message type object
-    rospy.init_node('obstacle_avoidance_node') # Initializes a node
-    pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)  # Publisher object which will publish "Twist" type messages
+    while not rospy.is_shutdown():
+        move = Twist() # Creates a Twist message type object
+        rospy.init_node('obstacle_avoidance_node') # Initializes a node
+        pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)  # Publisher object which will publish "Twist" type messages
                                 				 # on the "/cmd_vel" Topic, "queue_size" is the size of the
                                                              # outgoing message queue used for asynchronous publishing
 
-    sub = rospy.Subscriber("/scan", LaserScan, callback)
+        sub = rospy.Subscriber("/scan", LaserScan, callback)
 
 
-    odom_sub = rospy.Subscriber('/odom', Odometry, callback1)  # Subscriber object which will listen "LaserScan" type messages
-    beep()                                                     # from the "/scan" Topic and call the "callback" function
-    						      # each time it reads something from the Topic
+        odom_sub = rospy.Subscriber('/odom', Odometry, callback1)  # Subscriber object which will listen "LaserScan" type messages
+        try:
+            beep()                                                     # from the "/scan" Topic and call the "callback" function
+        except rospy.ROSInterruptException:
+            pass						      # each time it reads something from the Topic
+	
 
-    rospy.spin() # Loops infinitely until someone stops the program execution
+        rospy.spin() # Loops infinitely until someone stops the program execution
 

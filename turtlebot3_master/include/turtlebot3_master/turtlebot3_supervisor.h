@@ -32,6 +32,12 @@
 #include <move_base_msgs/MoveBaseActionGoal.h>
 #include <actionlib_msgs/GoalID.h>
 #include <cmath>
+#include <chrono>
+#include <thread>
+#include <iostream>
+using namespace std;
+using namespace std::literals;
+using clock_type = std::chrono::high_resolution_clock;
 
  
 
@@ -70,7 +76,10 @@ class Turtlebot3Supervisor
   ~Turtlebot3Supervisor();
   bool init();
   bool controlLoop();
-
+	static bool breakoutPossible_;
+    static bool timerStarted_;
+	 static void timerCallback(const ros::TimerEvent& event);
+	 static void timerCallback2(const ros::TimerEvent& event);
  private:
   // ROS NodeHandle
   ros::NodeHandle nh_;
@@ -79,6 +88,7 @@ class Turtlebot3Supervisor
   double linMaxVel = 0.3;
   double angMaxVel = 1.5;
   int currentController = 0;
+
   
   // ROS Parameters
 
@@ -110,8 +120,8 @@ class Turtlebot3Supervisor
   int finiteStateMachineState_ = 0;
 
     float maxSpeed_ = 0.22;
-    float slowSpeed_ = 0.1;
-    float safeZoneDist_ = 0.4;
+    float slowSpeed_ = 0.08;
+    float safeZoneDist_ = 0.2;
     float bufferZoneDist_ = 0.8;
     float minRangeFront_, minRangeBack_, minRange_;
 	int drivingDirection = 0;
@@ -132,9 +142,10 @@ class Turtlebot3Supervisor
 	float collectedChunkTurnedRight_ = 0.0;
 
 	// 1=SafeMode 2=SemiAutonomy 3=FullAutonomy
-	int testCondition = 1;
+	int testCondition = 2;
 
     bool circlePressed_ = false;
+
 
   float scanData[360][3] = {0};
 
@@ -142,8 +153,12 @@ class Turtlebot3Supervisor
   double tb3_pose_;
   double prev_tb3_pose_;
 
+	ros::Timer timer_;
+	ros::Timer timer2_;
+
 
   // Function prototypes
+
   float findMinDist(float startLeftAngle, float angle);
   void calculateChunks(float startAngle);
   Quaternion eulerToQuat(double yaw, double pitch, double roll);

@@ -9,7 +9,7 @@ void doSomething()
 {
 	cout << "\a";
     cout << "Beep" << endl;
-   
+    printf("\a");
 }
 
 
@@ -57,7 +57,7 @@ void timeSlow()
 }
 int main()
 {
-	int whichTimer = 3;
+	int whichTimer = 2;
 	if(whichTimer == 1)
 	{
 		timeSlow();
