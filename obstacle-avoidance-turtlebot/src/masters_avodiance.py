@@ -18,10 +18,14 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from std_msgs.msg import String,Int32,Int32MultiArray,MultiArrayLayout,MultiArrayDimension
 from turtlebot3_master.msg import ScanData
+#from pyquaternion import Quaternion
 
 positionx = None
 positiony = None
-rotationz = 0
+zq = 0
+wq= 0
+xq = 0
+yq = 0
 alreadyClicked = 0
 start = False
 J11 = 0
@@ -54,25 +58,40 @@ def callback1(dt):
     #print("90 odleglosc",dt.ranges[90])
    # #print ("90 odleglooosc",dt.ranges[dt.ranges[90]] * 20)
     closestObtacleAngle = dt.ranges.index(min(dt.ranges))
+    t0 = +2.0 * (wq * xq + yq * zq)
+    t1 = +1.0 - 2.0 * (xq * xq + yq* yq)
+    roll_x = math.atan2(t0, t1)
+     
+    t2 = +2.0 * (wq * yq - zq * xq)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    pitch_y = math.asin(t2)
+     
+    t3 = +2.0 * (wq * zq + xq * yq)
+    t4 = +1.0 - 2.0 * (yq * yq + zq * zq)
+    yaw_z = math.atan2(t3, t4)
+    changedToAngles = (180 * yaw_z)/(math.pi) 
+    print("angle" , yaw_z, changedToAngles)
     x = (407/2) + -(1) * ((407 - 0) / (10 - (-10)))
+
     for distance in range(len(dt.ranges)):
     	#print (distance , start)
     	arrayOfObstacles[distance] = dt.ranges[distance]
     	#print rotationz
-    	if (rotationz > 0.995 or rotationz < -0.995):    		
-    		if(start == False and alreadyClicked == 0):
-    			start = True
-    			alreadyClicked = 1
+    	#if (rotationz > 0.995 or rotationz < -0.995):    		
+    		#if(start == False and alreadyClicked == 0):
+    			#start = True
+    			#alreadyClicked = 1
 
-    		if(start == True and alreadyClicked == 0):
-    			start = False
-    			alreadyClicked = 1
+    		#if(start == True and alreadyClicked == 0):
+    			#start = False
+    			#alreadyClicked = 1
 
 
-    	if start == False:
-    		angle = (math.radians(360 - distance - (145 * rotationz)))
-    	if start == True: 
-    		angle = (math.radians(360 - distance + (145 * rotationz)))
+    	#if start == False:    	
+    	angle = (math.radians(360 - distance - changedToAngles))
+    	#if start == True: 
+    		#angle = (math.radians(360 - distance + (140 * 0.5)))
     	 	
     	#print ("kat",angle)
     	radius = dt.ranges[distance] * 20
@@ -112,7 +131,10 @@ def callback(msg):
 	#print(msg.pose.pose.position.y)	
 	global positionx
 	global positiony
-	global rotationz
+	global zq
+	global wq
+	global xq
+	global yq
 	positionx =  msg.pose.pose.position.x
 	positiony =  msg.pose.pose.position.y
    
@@ -127,14 +149,18 @@ def callback(msg):
 	J11 = 407 - J11 
 
 	J22 = (407/2) + -(positiony) * ((407 -  0 )/ (10 - (-10)))
-	rotationz =  msg.pose.pose.orientation.z
+	zq =  msg.pose.pose.orientation.z
+	wq =  msg.pose.pose.orientation.w
+	yq =  msg.pose.pose.orientation.y
+	xq =  msg.pose.pose.orientation.x
+	#print (xq , yq , zq ,wq )
 	#print msg.pose.pose.orientation.z
 	#print(J11 , J22)
 	return J11 , J22 
 
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
+	matrix = cv2.imread("/home/harumanager/catkin_ws/src/ROB10/maps/supermap1.pgm", cv2.IMREAD_COLOR)
 	print("zaczynam")	
 	#pp.imshow(matrix)
 	#pp.show()
@@ -255,10 +281,10 @@ def cutCirle():
 
 			#print('value' , x)
 			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
-				if (assumedx[values] - (assumedx[values] * 0.05) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.05)):
+				if (assumedx[values] - (assumedx[values] * 0.03) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.03)):
 					indexxy = xy
 					#print(indexxy , xcoords[xy] , x )				
-					if (assumedy[values] - (assumedy[values] * 0.05)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.05)):
+					if (assumedy[values] - (assumedy[values] * 0.03)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.03)):
 						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
@@ -330,7 +356,8 @@ def cutCirle():
 	#hello_str = obstacleType
 	rospy.loginfo(scanDataMsg)
 	pub.publish(scanDataMsg)
-	
+	print("HAAAAAAAAAAAAAAALLLLLLLLLLLOOOOOOOOOOOOOOOOOO")
+
 	#del arrayOfObstacles
 	#arrayOfObstacles = []
 
