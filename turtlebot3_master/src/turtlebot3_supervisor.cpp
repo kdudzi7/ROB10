@@ -529,7 +529,7 @@ bool Turtlebot3Supervisor::controlLoop()
 				ROS_INFO("Moving to State 5");
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1) && breakoutPossible_ == true)
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1))// && breakoutPossible_ == true)
 			{
 				if(testCondition == 1)
 				{
@@ -539,22 +539,22 @@ bool Turtlebot3Supervisor::controlLoop()
 				else if(testCondition == 2)
 				{
 					ROS_INFO("Moving to State 8");
-					breakoutPossible_ = false;
-					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
-                    timer_.start();
+					//breakoutPossible_ = false;
+					//timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
+                    //timer_.start();
 		            finiteStateMachineState_ = 8;       
 				}
 				else if(testCondition == 3)
 				{
 					ROS_INFO("Moving to State 9");
-					breakoutPossible_ = false;
-					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
-                    timer_.start();
+					//breakoutPossible_ = false;
+					//timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
+                    //timer_.start();
 		            finiteStateMachineState_ = 9;       
 				}	
 			}
 
-			if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true && testCondition == 2)
+			/*if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true && testCondition == 2)
             {
 				breakoutPossible_ = false;
 				timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
@@ -565,7 +565,7 @@ bool Turtlebot3Supervisor::controlLoop()
 				breakoutPossible_ = false;
 				timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                 ROS_WARN("BROKEN OUT! Remaining in state");
-            }
+            }*/
                
         break;
 
@@ -600,7 +600,7 @@ bool Turtlebot3Supervisor::controlLoop()
 				ROS_INFO("Moving to State 5");
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1) && breakoutPossible_ == true)
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1))// && breakoutPossible_ == true)
 			{
 				if(testCondition == 1)
 				{
@@ -610,22 +610,22 @@ bool Turtlebot3Supervisor::controlLoop()
 				else if(testCondition == 2)
 				{
 					ROS_INFO("Moving to State 8");
-					breakoutPossible_ = false;
-					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
-                    timer_.start();
+					//breakoutPossible_ = false;
+					//timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
+                    //timer_.start();
 		            finiteStateMachineState_ = 8;       
 				}
 				else if(testCondition == 3)
 				{
 					ROS_INFO("Moving to State 9");
-					breakoutPossible_ = false;
-					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
-                    timer_.start();
+					//breakoutPossible_ = false;
+					//timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
+                    //timer_.start();
 		            finiteStateMachineState_ = 9;       
 				}	
 			}
 
-			if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true && testCondition == 2)
+			/*if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true && testCondition == 2)
             {
 				breakoutPossible_ = false;
 				timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
@@ -636,7 +636,7 @@ bool Turtlebot3Supervisor::controlLoop()
 				breakoutPossible_ = false;
 				timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                 ROS_WARN("BROKEN OUT! Remaining in state");
-            }
+            }*/
                    
         break;
        
@@ -671,7 +671,7 @@ bool Turtlebot3Supervisor::controlLoop()
             {
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1) && breakoutPossible_ == true)
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1))// && breakoutPossible_ == true)
 			{
 				if(testCondition == 1)
 				{
@@ -681,22 +681,22 @@ bool Turtlebot3Supervisor::controlLoop()
 				else if(testCondition == 2)
 				{
 					ROS_INFO("Moving to State 8");
-					breakoutPossible_ = false;
-					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
-                    timer_.start();
+					//breakoutPossible_ = false;
+					//timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
+                    //timer_.start();
 		            finiteStateMachineState_ = 8;       
 				}
 				else if(testCondition == 3)
 				{
 					ROS_INFO("Moving to State 9");
-					breakoutPossible_ = false;
-					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
-                    timer_.start();
+					//breakoutPossible_ = false;
+					//timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
+                    //timer_.start();
 		            finiteStateMachineState_ = 9;       
 				}	
 			}
 
-			if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true && testCondition == 2)
+			/*if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true && testCondition == 2)
             {
 				breakoutPossible_ = false;
 				timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
@@ -707,7 +707,7 @@ bool Turtlebot3Supervisor::controlLoop()
 				breakoutPossible_ = false;
 				timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                 ROS_WARN("BROKEN OUT! Remaining in state");
-            }
+            }*/
            
         break;
         
