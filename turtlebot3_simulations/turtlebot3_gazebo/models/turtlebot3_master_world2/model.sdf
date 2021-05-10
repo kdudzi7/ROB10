@@ -1912,6 +1912,833 @@
         </visual>
 
 
+<!-- Test course -->
+         <collision name='Box1'>
+            <pose>-2 -1 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.4 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box1_Visual'>
+            <pose>-2 -1 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.4 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+         <collision name='Box2_Collision'>
+            <pose>-2 -3 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.5 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box2_Visual'>
+            <pose>-2 -3 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.5 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+         <collision name='Box3_Collision'>
+            <pose>-1 -4 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box3_Visual'>
+            <pose>-1 -4 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+         <collision name='Box4_Collision'>
+            <pose>0.5 -5.5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>2.9 0.5 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box4_Visual'>
+            <pose>0.5 -5.5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>2.9 0.5 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+         <collision name='Box5_Collision'>
+            <pose>-2.5 -4.5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.7 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box5_Visual'>
+            <pose>-2.5 -4.5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.7 0.2 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+        <collision name='Box6_Collision'>
+            <pose>-1 -7 0 0 -0 -0</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box6_Visual'>
+            <pose>-1 -7 0 0 -0 -0</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.2 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+        <collision name='Box7_Collision'>
+            <pose>-5 -6 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Box7_Visual'>
+            <pose>-5 -6 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.2 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+
+         <collision name='Box8_Collision'>
+            <pose>-1.5 -5.5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+  
+    <!-- Invisible Obstacle Course -->
+        <collision name='Box9_Collision'>
+            <pose>-1.3 3 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+      
+
+        <collision name='Box10_Collision'>
+            <pose>-1.5 5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>1.9 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+        <collision name='Box11_Collision'>
+            <pose>-0.5 1.5 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.9 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+      
+
+        <collision name='Box12_Collision'>
+            <pose>0.5 2.5 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.9 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+        <collision name='Box13_Collision'>
+            <pose>0 2.75 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.49 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box14_Collision'>
+            <pose>-0.6 3 0 0 -0 -0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        
+
+        <collision name='Box15_Collision'>
+            <pose>1.5 2 0 0 -0 -0.707</pose>
+          <geometry>
+            <box>
+              <size>1.57 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        
+
+        <collision name='Box16_Collision'>
+            <pose>2 3.5 0 0 -0 -0</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box17_Collision'>
+            <pose>1 0 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box18_Collision'>
+            <pose>3.5 1 0 0 -0 -0</pose>
+          <geometry>
+            <box>
+              <size>0.9 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box19_Collision'>
+            <pose>2.5 -0.5 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+      
+
+        <collision name='Box20_Collision'>
+            <pose>1.5 0.5 0 0 -0 -1.5707</pose>
+          <geometry>
+            <box>
+              <size>0.9 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box21_Collision'>
+            <pose>-0.5 5 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+      
+
+        <collision name='Box22_Collision'>
+            <pose>1 8 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.98 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+        <collision name='Box23_Collision'>
+            <pose>2.5 7 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        
+
+        <collision name='Box24_Collision'>
+            <pose>1 5 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box25_Collision'>
+            <pose>2.5 5 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.3</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box26_Collision'>
+            <pose>4 5 0 0 -0 -0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.4</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        
+        <collision name='Box27_Collision'>
+            <pose>5 5 0 0 -0 -0.707</pose>
+          <geometry>
+            <box>
+              <size>2.82 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+        <collision name='Box28_Collision'>
+            <pose>5.5 1.5 0 0 -0 0.707</pose>
+          <geometry>
+            <box>
+              <size>1.414 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+        <collision name='Box29_Collision'>
+            <pose>5.5 0.5 0 0 -0 -0.707</pose>
+          <geometry>
+            <box>
+              <size>1.414 0.1 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+        <collision name='Box30_Collision'>
+            <pose>4.5 3 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.4 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        
+        <collision name='Box31_Collision'>
+            <pose>5 -4 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>2.0 0.2 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+       
+
+        <collision name='Box32_Collision'>
+            <pose>5 -1 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.5 1.0</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        
+
 
 	<!-- GOAL POINTS, Only visual-->
 	<visual name='btm_right'>
@@ -1931,7 +2758,7 @@
         </visual>
 
 	<visual name='btm_left'>
-          <pose>-3.0 3.0 0.0 0 0 0</pose>
+          <pose>1.0 9.0 0.0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius>0.15</radius>
