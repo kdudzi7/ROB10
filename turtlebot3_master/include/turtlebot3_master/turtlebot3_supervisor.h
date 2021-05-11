@@ -145,6 +145,7 @@ class Turtlebot3Supervisor
 	int testCondition = 2;
 
     bool circlePressed_ = false;
+    int numberOfBreakouts_ = 0;
 
 
   float scanData[360][3] = {0};
