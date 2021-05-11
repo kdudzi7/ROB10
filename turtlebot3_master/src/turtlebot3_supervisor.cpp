@@ -53,6 +53,8 @@ bool Turtlebot3Supervisor::init()
   odom_sub_ = nh_.subscribe("odom", 10, &Turtlebot3Supervisor::odomMsgCallBack, this);
   joy_sub_ = nh_.subscribe("joy", 10, &Turtlebot3Supervisor::joyMsgCallBack, this);
 
+
+  nh_.setParam("/drivingDirection", 1);
   return true;
 }
 
@@ -1048,6 +1050,7 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "turtlebot3_supervisor");
   Turtlebot3Supervisor turtlebot3_supervisor;
   ros::Rate loop_rate(125);
+
 
   while (ros::ok())
   {
