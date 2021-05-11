@@ -77,6 +77,9 @@ def callback(dt):
             print ("left",index)
             direction = 2
             valueOfBeep = abs(index - 90) * 0.02
+        if(index > 30 and index < 60):
+            valueOfBeep = 0.5
+            print("middle")
     if(Forward == -1 and isDriving != 0.0):
         print("BackwardDriving")
         if(45 - index > 0):
@@ -87,6 +90,10 @@ def callback(dt):
             print "left"
             direction = 1
             valueOfBeep = abs(index - 90) * 0.02
+        if(index > 30 and index < 60):
+            valueOfBeep = 0.5
+            print("middle")
+	
     start = 0
     startRight = 10
     endRight = 55

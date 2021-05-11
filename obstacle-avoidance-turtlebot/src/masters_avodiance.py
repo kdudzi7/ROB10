@@ -11,6 +11,7 @@ from threading import Timer
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot
+import threading
 from math import cos, sin, pi
 from sensor_msgs.msg import LaserScan # LaserScan type message is defined in sensor_msgs
 from geometry_msgs.msg import Twist #
@@ -71,7 +72,7 @@ def callback1(dt):
     t4 = +1.0 - 2.0 * (yq * yq + zq * zq)
     yaw_z = math.atan2(t3, t4)
     changedToAngles = (180 * yaw_z)/(math.pi) 
-    print("angle" , yaw_z, changedToAngles)
+    #print("angle" , yaw_z, changedToAngles)
     x = (407/2) + -(1) * ((407 - 0) / (10 - (-10)))
 
     for distance in range(len(dt.ranges)):
@@ -121,9 +122,11 @@ def callback1(dt):
 
 def changeTozero():
 	global alreadyClicked
-	print alreadyClicked
+	#print alreadyClicked
 	alreadyClicked = 0
+	print(threading.active_count())
 	Timer(0.5, changeTozero).start()
+
 
 
 def callback(msg):
@@ -161,7 +164,7 @@ def callback(msg):
 def cutCirle():
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
 	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
-	print("zaczynam")	
+	#print("zaczynam")	
 	#pp.imshow(matrix)
 	#pp.show()
 	matrix = matrix[200:607, 0:407]
@@ -319,11 +322,11 @@ def cutCirle():
 			#obstacleType = 0
 	else:
 		if (math.isinf(closestObstacle) == True ):
-			print("There is no obstacles")
+			#print("There is no obstacles")
 			obstacleType = 2
 
 		elif (math.isinf(closestObstacle) == False):
-			print ("There is obstacle only in simulator")
+			#print ("There is obstacle only in simulator")
 			obstacleType = 0 
 
 
@@ -354,9 +357,9 @@ def cutCirle():
 	scanDataMsg.ranges = arrayOfObstacles
 	scanDataMsg.type = obstacleTypeArray
 	#hello_str = obstacleType
-	rospy.loginfo(scanDataMsg)
+	#rospy.loginfo(scanDataMsg)
 	pub.publish(scanDataMsg)
-	print("HAAAAAAAAAAAAAAALLLLLLLLLLLOOOOOOOOOOOOOOOOOO")
+	#print("HAAAAAAAAAAAAAAALLLLLLLLLLLOOOOOOOOOOOOOOOOOO")
 
 	#del arrayOfObstacles
 	#arrayOfObstacles = []
@@ -379,11 +382,11 @@ def point_on_circle():
 
     angle = (math.radians(closestObtacleAngle - 90))
     radius = closestObstacle * 20.35
-    print("radius" ,radius)
+    #print("radius" ,radius)
     x = J11 + (radius * cos(angle))
     y = J22 + (radius * sin(angle))
-    print("czy sie zgadzaja ",x,y)
-    print(arrayOfObstacles[4])
+    #print("czy sie zgadzaja ",x,y)
+    #print(arrayOfObstacles[4])
 
     return x,y
 
@@ -393,17 +396,17 @@ def point_on_circle2():
 	center = [J22, J11]	
 
 	for xy in range(360):
-		print(xy)
+		#print(xy)
 		angle = (math.radians(xy - 90))		
     	radius = arrayOfObstacles[xy] * 20.35
-    	print("new radius " , arrayOfObstacles[xy])    	
+    	#print("new radius " , arrayOfObstacles[xy])    	
     	x = J11 + (radius * cos(angle))
-    	print("nowe x" , x)
+    	#print("nowe x" , x)
     	y = J22 + (radius * sin(angle))    	
     	assumedx.append(J11 + (arrayOfObstacles[xy]*20.35 * cos(angle)))
     	assumedy.append(J22 + (arrayOfObstacles[xy]*20.35 * sin(angle)))
 
-	print("nasz assumed x dlufi" ,assumedx ,assumedx[5])
+	#print("nasz assumed x dlufi" ,assumedx ,assumedx[5])
 	return assumedx , assumedy
 
 def sector_mask(shape,centre,radius,angle_range):
@@ -472,10 +475,10 @@ if __name__ == '__main__':
 
 	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
 	#matrix1 = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	print(positionx , positiony)
+	#print(positionx , positiony)
 	#newx, newy = NewCoordinates(positionx, positiony)
 	#print("NewCoordinates" , newx, newy)
-	print(J11)
+	#print(J11)
 
 
 
@@ -497,16 +500,16 @@ if __name__ == '__main__':
 	#pp.show()
 
 
-	print("positionx", positionx)
+	#print("positionx", positionx)
 	cutCirle()
 	changeTozero()
 	#a = IntList()
 	#a.data = [typeOfObstacle,distance,angle]
 	point_on_circle()
-	print("type",obstacleType)
-	del assumedx
-	del assumedy
-	del arrayOfObstacles
+	#print("type",obstacleType)
+	#del assumedx
+	#del assumedy
+	#del arrayOfObstacles
 	
 	
 	#pub = rospy.Publisher('obstacleType', distance , angle , typeOfObstacle)
