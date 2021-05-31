@@ -71,23 +71,15 @@ include_directories(
 )
 
 
-add_executable(turtlebot3_automation src/turtlebot3_automation.cpp)
 add_executable(turtlebot3_supervisor src/turtlebot3_supervisor.cpp)
-add_executable(turtlebot3_obstacleIdentifier src/turtlebot3_obstacleidentifier.cpp)
-add_dependencies(turtlebot3_automation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(turtlebot3_supervisor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(turtlebot3_obstacleIdentifier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(turtlebot3_automation ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 target_link_libraries(turtlebot3_supervisor ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
-target_link_libraries(turtlebot3_obstacleIdentifier ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 
 ################################################################################
 # Install
 ################################################################################
 install(TARGETS
-turtlebot3_automation
 turtlebot3_supervisor
-turtlebot3_obstacleIdentifier
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

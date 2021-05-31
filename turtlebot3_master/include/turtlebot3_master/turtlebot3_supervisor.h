@@ -14,7 +14,7 @@
 * limitations under the License.
 *******************************************************************************/
 
-/* Authors: Taehun Lim (Darby) */
+/* Authors: Adrian Herskind & Karolina Dudzinska */
 
 #ifndef TURTLEBOT3_SUPERVISOR_H_
 #define TURTLEBOT3_SUPERVISOR_H_
@@ -25,25 +25,13 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <turtlebot3_master/Super.h>
 #include <turtlebot3_master/ScanData.h>
-#include <move_base_msgs/MoveBaseActionGoal.h>
-#include <actionlib_msgs/GoalID.h>
 #include <cmath>
 #include <chrono>
 #include <thread>
 #include <iostream>
-using namespace std;
-using namespace std::literals;
-using clock_type = std::chrono::high_resolution_clock;
-
- 
-
-#include <tf2/LinearMath/Quaternion.h>
-
-
 
 #define DEG2RAD (M_PI / 180.0)
 #define RAD2DEG (180.0 / M_PI)
@@ -52,124 +40,71 @@ using clock_type = std::chrono::high_resolution_clock;
 #define LEFT   1
 #define RIGHT  2
 
-#define LINEAR_VELOCITY  0.3
-#define ANGULAR_VELOCITY 1.5
-
-#define GET_TB3_DIRECTION 0
-#define TB3_DRIVE_FORWARD 1
-#define TB3_RIGHT_TURN    2
-#define TB3_LEFT_TURN     3
-
-struct Quaternion
-{
-    double x, y, z, w;
-};
-
-struct EulerAngles {
-    double roll, pitch, yaw;
-};
 
 class Turtlebot3Supervisor
 {
- public:
-  Turtlebot3Supervisor();
-  ~Turtlebot3Supervisor();
-  bool init();
-  bool controlLoop();
-	static bool breakoutPossible_;
-    static bool timerStarted_;
-	 static void timerCallback(const ros::TimerEvent& event);
-	 static void timerCallback2(const ros::TimerEvent& event);
- private:
-  // ROS NodeHandle
-  ros::NodeHandle nh_;
-  ros::NodeHandle nh_priv_;
+    public:
+        Turtlebot3Supervisor();
+        ~Turtlebot3Supervisor();
+        bool init();
+        bool controlLoop();
+	    static bool breakoutPossible_;
+        static bool timerStarted_;
+	    static void timerCallback(const ros::TimerEvent& event);
+	    static void timerCallback2(const ros::TimerEvent& event);
+    private:
+        // ROS NodeHandle
+        ros::NodeHandle nh_;
+        ros::NodeHandle nh_priv_;
 
-  double linMaxVel = 0.3;
-  double angMaxVel = 1.5;
-  int currentController = 0;
-
-  
-  // ROS Parameters
-
-  // ROS Time
-
-  // ROS Topic Publishers
-  ros::Publisher super_pub_;
-  ros::Publisher cmd_vel_pub_;
-  ros::Publisher move_base_goal_pub_;
-  ros::Publisher move_base_goal_cancel_pub_;
+        // ROS Topic Publishers
+        ros::Publisher super_pub_;
+        ros::Publisher cmd_vel_pub_;
             
-  // ROS Topic Subscribers
-  ros::Subscriber cmd_vel2_sub_;
-  ros::Subscriber cmd_vel3_sub_;
-  ros::Subscriber joy_sub_;
-  ros::Subscriber odom_sub_;
-  ros::Subscriber laser_scan_eval_sub_;
+        // ROS Topic Subscribers
+        ros::Subscriber cmd_vel2_sub_;
+        ros::Subscriber joy_sub_;
+        ros::Subscriber laser_scan_eval_sub_;
 
-  // Variables
-  double escape_range_;
-  double check_forward_dist_;
-  double check_side_dist_;
+        geometry_msgs::Twist cmdVel2Msg_;
+        geometry_msgs::Twist cmdVel3Msg_;
 
-  geometry_msgs::Twist cmdVel2Msg_;
-  geometry_msgs::Twist cmdVel3Msg_;
+        int finiteStateMachineState_ = 0;
 
-  double scan_data_[3] = {0.0, 0.0, 0.0};
-    bool goalSent = false;
-  int finiteStateMachineState_ = 0;
-
-    float maxSpeed_ = 0.22;
-    float slowSpeed_ = 0.08;
-    float safeZoneDist_ = 0.2;
-    float bufferZoneDist_ = 0.8;
-    float minRangeFront_, minRangeBack_, minRange_;
-	int drivingDirection = 0;
-
-    float currentPositionX_;
-    float currentPositionY_;
-    float currentOrientationZ_;
-    float currentOrientationW_;
+        float maxSpeed_ = 0.22;
+        float slowSpeed_ = 0.08;
+        float safeZoneDist_ = 0.2;
+        float bufferZoneDist_ = 0.8;
+        float minRangeFront_, minRangeBack_;
+    	int drivingDirection = 0;
 	
-	float chunkValues[8] = {};
-	float chunkWeights[8] = {1.0, -0.1, -0.0, 0.2, 0.2, -0.1, -0.0, 1.0};
-	float collectedChunk_ = 0.0;
+	    float chunkValues[8] = {};
+    	float chunkWeights[8] = {1.0, -0.1, -0.0, 0.2, 0.2, -0.1, -0.0, 1.0};
+    	float collectedChunk_ = 0.0;
 
-	float chunkValuesTurnedLeft[8] = {};
-	float collectedChunkTurnedLeft_ = 0.0;
+	    float chunkValuesTurnedLeft[8] = {};
+    	float collectedChunkTurnedLeft_ = 0.0;
 
-	float chunkValuesTurnedRight[8] = {};
-	float collectedChunkTurnedRight_ = 0.0;
+	    float chunkValuesTurnedRight[8] = {};
+    	float collectedChunkTurnedRight_ = 0.0;
 
-	// 1=SafeMode 2=SemiAutonomy 3=FullAutonomy
-	int testCondition = 2;
+	    // 1=Feedback Assisted Teleoperation 2=Shared Control 3=Full Autonomy
+	    int testCondition = 2;
 
-    bool circlePressed_ = false;
-    int numberOfBreakouts_ = 0;
+        int numberOfBreakouts_ = 0;
 
+        float scanData[360][3] = {0};
 
-  float scanData[360][3] = {0};
+	    ros::Timer timer_;
+    	ros::Timer timer2_;
 
+        // Function prototypes
+        float findMinDist(float startLeftAngle, float angle);
+        void calculateChunks(float startAngle);
 
-  double tb3_pose_;
-  double prev_tb3_pose_;
+        void updateSuperCommand(float linearVelLimit, float angularVelLimit);
 
-	ros::Timer timer_;
-	ros::Timer timer2_;
-
-
-  // Function prototypes
-
-  float findMinDist(float startLeftAngle, float angle);
-  void calculateChunks(float startAngle);
-  Quaternion eulerToQuat(double yaw, double pitch, double roll);
-  EulerAngles ToEulerAngles(Quaternion q);
-  void updateSuperCommand(float linearVelLimit, float angularVelLimit);
-  void cmdVel2MsgCallBack(const geometry_msgs::Twist::ConstPtr &msg);
-  void cmdVel3MsgCallBack(const geometry_msgs::Twist::ConstPtr &msg);
-  void laserScanEvalMsgCallBack(const turtlebot3_master::ScanData::ConstPtr &msg);
-  void joyMsgCallBack(const sensor_msgs::Joy::ConstPtr &msg);
-  void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
-  //void odomMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
+        void cmdVel2MsgCallBack(const geometry_msgs::Twist::ConstPtr &msg);
+        void laserScanEvalMsgCallBack(const turtlebot3_master::ScanData::ConstPtr &msg);
 };
 #endif // TURTLEBOT3_SUPERVISOR_H_

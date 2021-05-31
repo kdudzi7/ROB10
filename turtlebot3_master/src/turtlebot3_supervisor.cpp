@@ -3,23 +3,22 @@
 * 
 *******************************************************************************/
 
-/* Authors: Taehun Lim (Darby) */
+/* Authors: Adrian Herskind & Karolina Dudzinska */
 
 #include "turtlebot3_master/turtlebot3_supervisor.h"
 
 Turtlebot3Supervisor::Turtlebot3Supervisor()
-  : nh_priv_("~")
+    : nh_priv_("~")
 {
-  //Init gazebo ros turtlebot3 node
-
-  auto ret = init();
-  ROS_ASSERT(ret);
+    //Init gazebo ros turtlebot3 node
+    auto ret = init();
+    ROS_ASSERT(ret);
 }
 
 Turtlebot3Supervisor::~Turtlebot3Supervisor()
 {
-  updateSuperCommand(0.0, 0.0);
-  ros::shutdown();
+    updateSuperCommand(0.0, 0.0);
+    ros::shutdown();
 }
 
 /*******************************************************************************
@@ -27,52 +26,42 @@ Turtlebot3Supervisor::~Turtlebot3Supervisor()
 *******************************************************************************/
 bool Turtlebot3Supervisor::init()
 {
-  // initialize ROS parameter
-  std::string cmd_vel_topic_name = nh_.param<std::string>("cmd_vel_topic_name", "");
+    // initialize ROS parameter
+    std::string cmd_vel_topic_name = nh_.param<std::string>("cmd_vel_topic_name", "");
+    
+    // initialize test parameter
+    numberOfBreakouts_ = 0;
 
-  // initialize variables
-  escape_range_       = 30.0 * DEG2RAD;
-  check_forward_dist_ = 0.7; //orig 0.7
-  check_side_dist_    = 0.6; // orig 0.6
-
-  tb3_pose_ = 0.0;
-  prev_tb3_pose_ = 0.0;
-
-  numberOfBreakouts_ = 0;
-
+    // initialize state machine
     finiteStateMachineState_ = 1;
 
-  // initialize publishers
-  super_pub_ = nh_.advertise<turtlebot3_master::Super>("super_cmd", 10);
-  cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
-    move_base_goal_pub_ = nh_.advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 10);
-    move_base_goal_cancel_pub_ = nh_.advertise<actionlib_msgs::GoalID>("move_base/cancel", 10);
+    // initialize publishers
+    super_pub_ = nh_.advertise<turtlebot3_master::Super>("super_cmd", 10);
+    cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
 
-  // initialize subscribers
-  cmd_vel2_sub_ = nh_.subscribe("cmd_vel2", 10, &Turtlebot3Supervisor::cmdVel2MsgCallBack, this);
-  cmd_vel3_sub_ = nh_.subscribe("cmd_vel3", 10, &Turtlebot3Supervisor::cmdVel3MsgCallBack, this);
-  laser_scan_eval_sub_ = nh_.subscribe("scan_eval", 10, &Turtlebot3Supervisor::laserScanEvalMsgCallBack, this);
-  odom_sub_ = nh_.subscribe("odom", 10, &Turtlebot3Supervisor::odomMsgCallBack, this);
-  joy_sub_ = nh_.subscribe("joy", 10, &Turtlebot3Supervisor::joyMsgCallBack, this);
+    // initialize subscribers
+    cmd_vel2_sub_ = nh_.subscribe("cmd_vel2", 10, &Turtlebot3Supervisor::cmdVel2MsgCallBack, this);
+    laser_scan_eval_sub_ = nh_.subscribe("scan_eval", 10, &Turtlebot3Supervisor::laserScanEvalMsgCallBack, this);
 
+    ROS_WARN("Welcome.");
+    ROS_WARN("Number of Break outs is reset");
+    ROS_WARN("Have fun!");
 
-  ROS_WARN("Welcome.");
-  ROS_WARN("Number of Break outs is reset");
-  ROS_WARN("Have fun!");
-
-  nh_.setParam("/drivingDirection", 1);
-  return true;
+    // Set A default starting value for drivingDirection
+    nh_.setParam("/drivingDirection", 1);
+    return true;
 }
 
-void Turtlebot3Supervisor::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
-{
-
-}
-
+/*
+*When input from the PS3 Controller comes, the system saves the linear and angular velocity in variables.
+*If the linear input velocity is below 0 then the driving direction is set to backwards, else to forward
+*Driving Direction is updated.
+*/
 void Turtlebot3Supervisor::cmdVel2MsgCallBack(const geometry_msgs::Twist::ConstPtr &msg)
 {
     cmdVel2Msg_.linear.x = msg->linear.x;
     cmdVel2Msg_.angular.z = msg->angular.z;
+
 	if(cmdVel2Msg_.linear.x < 0.0)
 	{
 		drivingDirection = -1;
@@ -85,13 +74,9 @@ void Turtlebot3Supervisor::cmdVel2MsgCallBack(const geometry_msgs::Twist::ConstP
     nh_.setParam("/ps3LinVel", cmdVel2Msg_.linear.x);
 }
 
-void Turtlebot3Supervisor::cmdVel3MsgCallBack(const geometry_msgs::Twist::ConstPtr &msg)
-{
-    cmdVel3Msg_.linear.x = msg->linear.x;
-    cmdVel3Msg_.angular.z = msg->angular.z;
-}
-
-
+/**
+*When the ScanData message is received, the data is saved in an array
+*/
 void Turtlebot3Supervisor::laserScanEvalMsgCallBack(const turtlebot3_master::ScanData::ConstPtr &msg)
 {
     for(int i = 0; i < 360; i++)
@@ -102,30 +87,38 @@ void Turtlebot3Supervisor::laserScanEvalMsgCallBack(const turtlebot3_master::Sca
     }
 }
 
-void Turtlebot3Supervisor::joyMsgCallBack(const sensor_msgs::Joy::ConstPtr &msg)
-{
-}
-
+/**
+* Publishes a message with the new linear and angular velocity limits
+*/
 void Turtlebot3Supervisor::updateSuperCommand(float linearVelLimit, float angularVelLimit)
 {
-  turtlebot3_master::Super super_cmd;
+    turtlebot3_master::Super super_cmd;
 
-  super_cmd.linearVelLimit = linearVelLimit;
-  super_cmd.angularVelLimit = angularVelLimit;
+    super_cmd.linearVelLimit = linearVelLimit;
+    super_cmd.angularVelLimit = angularVelLimit;
 
-  super_pub_.publish(super_cmd);
+    super_pub_.publish(super_cmd);
 }
 
+/*
+* Returns the shortest distance from a set of scan data. The parameters describe the left angle and how much many angles should be spanned clockwise.
+*/
 float Turtlebot3Supervisor::findMinDist(float startLeftAngle, float angle)
 {
+    //Maximum value
     float minRange = 3.5;
+
+    //For invalid input, the function returns 666.0
+    //IMPROVE: Ideally it should return an error message
     if(startLeftAngle >= 360.0 || angle > 360.0 || startLeftAngle < 0.0 || angle <= 0.0)
     {
         return 666.0;
     }
 
+    //Case 1: If the angles we consider do not cross the 0 - it is a mathematical thing
     if((startLeftAngle - angle) > 0)
     {
+        //Iterate over all angles --- if range value is smaller than current minimum, set this range as minimum
         for(int i = (startLeftAngle - angle); i < startLeftAngle; i++)
         {
             if(scanData[i][0] < startLeftAngle && scanData[i][1] < minRange)
@@ -134,8 +127,10 @@ float Turtlebot3Supervisor::findMinDist(float startLeftAngle, float angle)
             }
         }
     }
+    //Case 2: If angles we consider do cross the 0
     else
     {
+        //First section of the angles we consider - iterate over all angles from 0 counter clockwise - if range value is smaller than current minimum, set this range as minimum
         for(int i = 0; i < startLeftAngle; i++)
         {
             if(scanData[i][0] < startLeftAngle && scanData[i][1] < minRange)
@@ -143,7 +138,7 @@ float Turtlebot3Supervisor::findMinDist(float startLeftAngle, float angle)
                 minRange = scanData[i][1];
             }
         }
-        
+
         for(int i = (360 + startLeftAngle - angle); i < 360; i++)
         {
             if(scanData[i][0] > (360 + startLeftAngle - angle) && scanData[i][1] < minRange)
@@ -153,16 +148,22 @@ float Turtlebot3Supervisor::findMinDist(float startLeftAngle, float angle)
         }
     }
 
-
-
     return minRange;
 }
 
-void Turtlebot3Supervisor::calculateChunks(float startAngle)
+/*
+*Calculates chunk values for 8 chunks, 360 degree scan is split up in 45 degree chunks, starts at 0 degrees
+*For each chunk we sum a value calculated from the range --> This gives a chunkValue for each chunk, weighted
+*We calculate a collectedChuk, which is the sum of all 8 chunkValues
+*Then we simulate a 10 degree left and right turn and calculate chunk sums for these as well.
+*We only consider ranges closer than 0.4
+*/
+void Turtlebot3Supervisor::calculateChunks()
 {
 	collectedChunk_ = 0.0;
     for(int x = 0; x < 8; x++)
     {
+        //Adapting chunkWeights to driving direction
 		if(drivingDirection == 1)
 		{
 			chunkWeights[0] = 1.0;
@@ -177,6 +178,7 @@ void Turtlebot3Supervisor::calculateChunks(float startAngle)
 			chunkWeights[3] = 1.0;
 			chunkWeights[4] = 1.0;
 		}
+
 		chunkValues[x] = 0.0;
         for(int i = 45 * x; i < 45 * (x+1); i++)
         {
@@ -191,9 +193,7 @@ void Turtlebot3Supervisor::calculateChunks(float startAngle)
     }
 	//ROS_INFO("CHUNK SUM IS %f", collectedChunk_);
 	
-
-
-
+    //Calculation for everything turned 10 degrees to right
 	float scanDataTurnedRight[360];
 	for(int i = 10; i < 360; i++)
 	{
@@ -217,12 +217,11 @@ void Turtlebot3Supervisor::calculateChunks(float startAngle)
         }
 		chunkValuesTurnedRight[x] = chunkValuesTurnedRight[x] * chunkWeights[x];
 
-			collectedChunkTurnedRight_ = collectedChunkTurnedRight_ + chunkValuesTurnedRight[x];
+		collectedChunkTurnedRight_ = collectedChunkTurnedRight_ + chunkValuesTurnedRight[x];
     }
 	//ROS_INFO("CHUNK SUM TURNED RIGHT IS %f", collectedChunkTurnedRight_);
 	
-
-
+    //Calculation for everything turned 10 degrees to left
 	float scanDataTurnedLeft[360];
 	for(int i = 0; i < 350; i++)
 	{
@@ -246,86 +245,48 @@ void Turtlebot3Supervisor::calculateChunks(float startAngle)
         }
 		chunkValuesTurnedLeft[x] = chunkValuesTurnedLeft[x] * chunkWeights[x];
 
-			collectedChunkTurnedLeft_ = collectedChunkTurnedLeft_ + chunkValuesTurnedLeft[x];
+		collectedChunkTurnedLeft_ = collectedChunkTurnedLeft_ + chunkValuesTurnedLeft[x];
     }
 	//ROS_INFO("CHUNK SUM TURNED LEFT IS %f", collectedChunkTurnedLeft_);
-
-	
-
-
 }
 
-Quaternion Turtlebot3Supervisor::eulerToQuat(double yaw, double pitch, double roll)
+
+/*
+* When this timer runs out, breakout is again possible
+*/
+void Turtlebot3Supervisor::timerCallback(const ros::TimerEvent& event)
 {
-
-    double cy = cos(yaw * 0.5);
-    double sy = sin(yaw * 0.5);
-    double cp = cos(pitch * 0.5);
-    double sp = sin(pitch * 0.5);
-    double cr = cos(roll * 0.5);
-    double sr = sin(roll * 0.5);
-
-    Quaternion q;
-    q.w = cr * cp * cy + sr * sp * sy;
-    q.x = sr * cp * cy - cr * sp * sy;
-    q.y = cr * sp * cy + sr * cp * sy;
-    q.z = cr * cp * sy - sr * sp * cy;
-           
-    return q;
+	breakoutPossible_ = true;
 }
 
-EulerAngles Turtlebot3Supervisor::ToEulerAngles(Quaternion q) {
-    EulerAngles angles;
-
-    // roll (x-axis rotation)
-    double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-    double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
-    angles.roll = std::atan2(sinr_cosp, cosr_cosp);
-
-    // pitch (y-axis rotation)
-    double sinp = 2 * (q.w * q.y - q.z * q.x);
-    if (std::abs(sinp) >= 1)
-        angles.pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
-    else
-        angles.pitch = std::asin(sinp);
-
-    // yaw (z-axis rotation)
-    double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-    double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
-    angles.yaw = std::atan2(siny_cosp, cosy_cosp);
-
-    return angles;
+/*
+* When this timer runs out, a system sound is played
+*/
+void Turtlebot3Supervisor::timerCallback2(const ros::TimerEvent& event)
+{
+    std::cout << "\a" << std::flush;
 }
-
-	void Turtlebot3Supervisor::timerCallback(const ros::TimerEvent& event)
-	{
-		//ROS_WARN("TIMER");
-		breakoutPossible_ = true;
-	}
-
-	void Turtlebot3Supervisor::timerCallback2(const ros::TimerEvent& event)
-	{
-            //ROS_WARN("BEEP");
-	        cout << "\a" << flush;
-	}
 
 /*******************************************************************************
-* Control Loop function
+* Control Loop function - here everything fun happens
 *******************************************************************************/
 bool Turtlebot3Supervisor::controlLoop()
 {
+    //What is the closest object in front and back
     minRangeFront_ = findMinDist(35.0, 70.0);
     minRangeBack_ = findMinDist(215.0, 70.0);
-	//minRange_ = findMinDist(0.0, 360.0);
-	calculateChunks(0.0);
+
+    //We calculate the chunks
+	calculateChunks();
+
 	float angularVelocity;
 	float linearVelocity;
     float bufferSpeed;
-	float maxSpeed = 0.0;
-	auto when_started = clock_type::now(); 
-   	auto target_time = when_started + 100ms;
-    auto now = clock_type::now();
+
+    //What test condition are we in? 1=Teleoperation, 2=SharedControl, 3=FullAutonomy
 	nh_.getParam("/testCondition", testCondition);
+
+    //If the timer is not started, we start it in case we are in one of the (semi-)autonomous states (8,9), else it gets stopped
     if(timerStarted_ == false)
     {
         if(finiteStateMachineState_ == 8 || finiteStateMachineState_ == 9)
@@ -338,59 +299,53 @@ bool Turtlebot3Supervisor::controlLoop()
             timer2_.stop();
         }
     }
+
+    //LeftOver messages from Debug
 	//ROS_WARN("Break %i", breakoutPossible_);
 	//ROS_INFO("Test condition %i", testCondition);
 	//ROS_INFO("minRangeF %f", minRangeFront_);
 	//ROS_INFO("minRangeB %f", minRangeBack_);
 	//ROS_INFO("Driving direction %i", drivingDirection);
 
+    //FSM
     switch(finiteStateMachineState_)
     {
-
-		//Free Driving State
+		//Free Driving State --- Operator drives freeely with speed limits
         case 1:
-	        //cout << "\a";
             updateSuperCommand(maxSpeed_, 1.0);
             cmd_vel_pub_.publish(cmdVel2Msg_);
             timerStarted_ = false;
 
             //ROS_INFO("Free Drive zone, FSM is %i", finiteStateMachineState_);
 
-		
             if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
             {
                 finiteStateMachineState_ = 1;
             }
             else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
             {
-				//ROS_INFO("Moving to State 2");
                 finiteStateMachineState_ = 2;                
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 3");
                 finiteStateMachineState_ = 3;                
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 4");
                 finiteStateMachineState_ = 4;
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 5");
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1) && breakoutPossible_ == true)
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < -0.1) && breakoutPossible_ == true)
 			{
 				if(testCondition == 1)
 				{
-					//ROS_INFO("Moving to State 7");
 		            finiteStateMachineState_ = 7;       					
 				}
 				else if(testCondition == 2)
 				{
-					//ROS_INFO("Moving to State 8");
 					breakoutPossible_ = false;
 					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                     timer_.start();
@@ -398,7 +353,6 @@ bool Turtlebot3Supervisor::controlLoop()
 				}
 				else if(testCondition == 3)
 				{
-					//ROS_INFO("Moving to State 9");
 					breakoutPossible_ = false;
 					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                     timer_.start();
@@ -421,7 +375,6 @@ bool Turtlebot3Supervisor::controlLoop()
 
             if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
             {
-				//ROS_INFO("Moving to State 1");
                 finiteStateMachineState_ = 1;
             }
             else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
@@ -430,29 +383,24 @@ bool Turtlebot3Supervisor::controlLoop()
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 3");
                 finiteStateMachineState_ = 3;                
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 4");
                 finiteStateMachineState_ = 4;
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 5");
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1) && breakoutPossible_ == true)
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < -0.1) && breakoutPossible_ == true)
 			{
 				if(testCondition == 1)
 				{
-					//ROS_INFO("Moving to State 7");
 		            finiteStateMachineState_ = 7;       					
 				}
 				else if(testCondition == 2)
 				{
-					//ROS_INFO("Moving to State 8");
 					breakoutPossible_ = false;
 					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                     timer_.start();
@@ -460,7 +408,6 @@ bool Turtlebot3Supervisor::controlLoop()
 				}
 				else if(testCondition == 3)
 				{
-					//ROS_INFO("Moving to State 9");
 					breakoutPossible_ = false;
 					timer_ = nh_.createTimer(ros::Duration(5.0), &Turtlebot3Supervisor::timerCallback, true);
                     timer_.start();
@@ -470,7 +417,7 @@ bool Turtlebot3Supervisor::controlLoop()
 
         break;
 
-		//Safety Zone in the front is violated --- move backwards
+		//Safety Zone in the front is violated --- move backwards with low speed or operator input, whichever is highest
         case 3:
              cmdVel3Msg_.linear.x = std::min(-0.02, cmdVel2Msg_.linear.x);
              
@@ -480,12 +427,10 @@ bool Turtlebot3Supervisor::controlLoop()
 
             if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
             {
-				//ROS_INFO("Moving to State 1");
                 finiteStateMachineState_ = 1;
             }
             else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
             {
-				//ROS_INFO("Moving to State 2");
                 finiteStateMachineState_ = 2;                
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
@@ -494,29 +439,24 @@ bool Turtlebot3Supervisor::controlLoop()
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 4");
                 finiteStateMachineState_ = 4;
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 5");
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1))
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < -0.1))
 			{
 				if(testCondition == 1)
 				{
-					//ROS_INFO("Moving to State 7");
 		            finiteStateMachineState_ = 7;       					
 				}
 				else if(testCondition == 2)
 				{
-					//ROS_INFO("Moving to State 8");
 		            finiteStateMachineState_ = 8;       
 				}
 				else if(testCondition == 3)
 				{
-					//ROS_INFO("Moving to State 9");
 		            finiteStateMachineState_ = 9;       
 				}	
 			}
@@ -525,7 +465,7 @@ bool Turtlebot3Supervisor::controlLoop()
                
         break;
 
-		//Safety Zone in the back is violated --- move forward
+		//Safety Zone in the back is violated --- move forward with low speed or operator input, whichever is highest
         case 4:
              cmdVel3Msg_.linear.x = std::max(0.02, cmdVel2Msg_.linear.x);
              cmdVel3Msg_.angular.z = cmdVel2Msg_.angular.z;
@@ -534,17 +474,14 @@ bool Turtlebot3Supervisor::controlLoop()
 
             if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
             {
-				//ROS_INFO("Moving to State 1");
                 finiteStateMachineState_ = 1;
             }
             else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
             {
-				//ROS_INFO("Moving to State 2");
                 finiteStateMachineState_ = 2;                
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 3");
                 finiteStateMachineState_ = 3;                
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
@@ -553,24 +490,20 @@ bool Turtlebot3Supervisor::controlLoop()
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 5");
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1))
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < -0.1))
 			{
 				if(testCondition == 1)
 				{
-					//ROS_INFO("Moving to State 7");
 		            finiteStateMachineState_ = 7;       					
 				}
 				else if(testCondition == 2)
 				{
-					//ROS_INFO("Moving to State 8");
 		            finiteStateMachineState_ = 8;       
 				}
 				else if(testCondition == 3)
 				{
-					//ROS_INFO("Moving to State 9");
 		            finiteStateMachineState_ = 9;       
 				}	
 			}
@@ -588,53 +521,43 @@ bool Turtlebot3Supervisor::controlLoop()
 
             if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
             {
-				//ROS_INFO("Moving to State 1");
                 finiteStateMachineState_ = 1;
             }
             else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
             {
-				//ROS_INFO("Moving to State 2");
                 finiteStateMachineState_ = 2;                
             }
             else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 3");
                 finiteStateMachineState_ = 3;                
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
             {
-				//ROS_INFO("Moving to State 4");
                 finiteStateMachineState_ = 4;
             }
             else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
             {
                 finiteStateMachineState_ = 5;
             }  
-		    else if((collectedChunk_ > 0.1 || collectedChunk_ < 0.1))
+		    else if((collectedChunk_ > 0.1 || collectedChunk_ < -0.1))
 			{
 				if(testCondition == 1)
 				{
-					//ROS_INFO("Moving to State 7");
 		            finiteStateMachineState_ = 7;       					
 				}
 				else if(testCondition == 2)
 				{
-					//ROS_INFO("Moving to State 8");
 		            finiteStateMachineState_ = 8;       
 				}
 				else if(testCondition == 3)
 				{
-					//ROS_INFO("Moving to State 9");
 		            finiteStateMachineState_ = 9;       
 				}	
-			}
-
-           
+			} 
         break;
         
 	
-
-		//Teleoperation Obstacle Avoidance
+		//Teleoperation Obstacle Avoidance - ChunkWeights get oscillated - User drives freely on low speed
 		case 7:
 
 			
@@ -657,39 +580,34 @@ bool Turtlebot3Supervisor::controlLoop()
 
 		cmd_vel_pub_.publish(cmdVel2Msg_); 
 
-            if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
-            {
-				//ROS_INFO("Moving to State 1");
-                finiteStateMachineState_ = 1;
-            }
-            else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
+        if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
         {
-			//ROS_INFO("Moving to State 2");
+            finiteStateMachineState_ = 1;
+        }
+        else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
+        {
             finiteStateMachineState_ = 2;                
         }
         else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 3");
             finiteStateMachineState_ = 3;                
         }
         else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 4");
             finiteStateMachineState_ = 4;
         }
         else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 5");
             finiteStateMachineState_ = 5;
         }  
-		else if(collectedChunk_ > 0.1 || collectedChunk_ < 0.1)
+		else if(collectedChunk_ > 0.1 || collectedChunk_ < -0.1)
 		{
             finiteStateMachineState_ = 7;                			
 		}
 
 		break;
 
-		//Semi Autonomy Obstacle Avoidance
+		//Semi Autonomy Obstacle Avoidance - Chunk Weights get oscillated - System checks which direction brings chunkWeights closer to 0.0, turns that way - User controls Linear Velocity
 		case 8:
 		angularVelocity = std::min((abs(collectedChunk_ / minRangeFront_) * 2.84), 0.34);
 			
@@ -714,63 +632,59 @@ bool Turtlebot3Supervisor::controlLoop()
 		{
 			cmdVel3Msg_.linear.x = cmdVel2Msg_.linear.x;
 			cmdVel3Msg_.angular.z = angularVelocity;
-				//ROS_WARN("Turning left");
+			//ROS_WARN("Turning left");
 		}
 		else if(abs(collectedChunkTurnedRight_) < abs(collectedChunk_) && abs(collectedChunkTurnedRight_) < abs(collectedChunkTurnedLeft_))
 		{
 			cmdVel3Msg_.linear.x = cmdVel2Msg_.linear.x;
 		    cmdVel3Msg_.angular.z = -angularVelocity;
-				//ROS_WARN("Turning right");
+			//ROS_WARN("Turning right");
 		}
 		else if(abs(collectedChunk_) < abs(collectedChunkTurnedRight_) && abs(collectedChunk_) < abs(collectedChunkTurnedLeft_))
 		{
 			cmdVel3Msg_.linear.x = cmdVel2Msg_.linear.x;
 		    cmdVel3Msg_.angular.z = 0.0;
-				//ROS_WARN("Keeping Straight");
+			//ROS_WARN("Keeping Straight");
 		}
 
 		cmd_vel_pub_.publish(cmdVel3Msg_); 
 
-            if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
-            {
-				//ROS_INFO("Moving to State 1");
-                timer_.stop();
-                breakoutPossible_ = true;
-                finiteStateMachineState_ = 1;
-            }
-            else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
+        if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
         {
-			//ROS_INFO("Moving to State 2");
+            timer_.stop();
+            breakoutPossible_ = true;
+            finiteStateMachineState_ = 1;
+        }
+        else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
+        {
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 2;                
         }
         else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 3");
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 3;                
         }
         else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 4");
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 4;
         }
         else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 5");
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 5;
         }  
-		else if(collectedChunk_ > 0.1 || collectedChunk_ < 0.1)
+		else if(collectedChunk_ > 0.1 || collectedChunk_ < -0.1)
 		{
             finiteStateMachineState_ = 8;                			
 		}
 
+        //If the user applies angular velocity, control is transfered back. Timer is started to prevent immediate catchback
 		if((abs(cmdVel2Msg_.angular.z) >= 1.0) && breakoutPossible_ == true)
         {
             finiteStateMachineState_ = 2;
@@ -782,11 +696,8 @@ bool Turtlebot3Supervisor::controlLoop()
 		break;
 
 
-		//Full Autonomy Obstacle Avoidance
+		//Full Autonomy Obstacle Avoidance - Chunk Weights get oscillated - System checks which direction brings chunkWeights closer to 0.0, turns that way - System also controls Linear Velocity
 		case 9:
-
-          
-
 		angularVelocity = std::min((abs(collectedChunk_ / minRangeFront_) * 2.84), 0.34);
 			
 		if(chunkWeights[1] > 0.0)
@@ -804,8 +715,6 @@ bool Turtlebot3Supervisor::controlLoop()
 			chunkWeights[6] = -0.1;
 		}
            
-
-
 		if(abs(collectedChunkTurnedLeft_) < abs(collectedChunk_) && abs(collectedChunkTurnedLeft_) < abs(collectedChunkTurnedRight_))
 		{
 			cmdVel3Msg_.linear.x = 0.1;
@@ -827,46 +736,42 @@ bool Turtlebot3Supervisor::controlLoop()
 
 		cmd_vel_pub_.publish(cmdVel3Msg_); 
 
-            if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
-            {
-				//ROS_INFO("Moving to State 1");
-                timer_.stop();
-                breakoutPossible_ = true;
-                finiteStateMachineState_ = 1;
-            }
-            else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
+        if(collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1 && minRangeFront_ > bufferZoneDist_ && minRangeBack_ > bufferZoneDist_)
         {
-			//ROS_INFO("Moving to State 2");
+            timer_.stop();
+            breakoutPossible_ = true;
+            finiteStateMachineState_ = 1;
+        }
+        else if((minRangeBack_ < bufferZoneDist_ || minRangeFront_ < bufferZoneDist_) && minRangeBack_ >= safeZoneDist_ && minRangeFront_ >= safeZoneDist_ && collectedChunk_ <= 0.1 && collectedChunk_ >= -0.1)
+        {
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 2;                
         }
         else if(minRangeFront_ < safeZoneDist_ && minRangeBack_ > safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 3");
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 3;                
         }
         else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ > safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 4");
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 4;
         }
         else if(minRangeBack_ < safeZoneDist_ && minRangeFront_ < safeZoneDist_)
         {
-			//ROS_INFO("Moving to State 5");
             timer_.stop();
             breakoutPossible_ = true;
             finiteStateMachineState_ = 5;
         }  
-		else if(collectedChunk_ > 0.1 || collectedChunk_ < 0.1)
+		else if(collectedChunk_ > 0.1 || collectedChunk_ < -0.1)
 		{
             finiteStateMachineState_ = 9;                			
 		}
 
+        //If the user applies angular or linear velocity, control is transfered back. Timer is started to prevent immediate catchback
 		if((abs(cmdVel2Msg_.linear.x) > 0.0 || abs(cmdVel2Msg_.angular.z) > 0.0) && breakoutPossible_ == true)
         {
             finiteStateMachineState_ = 2;
@@ -878,15 +783,12 @@ bool Turtlebot3Supervisor::controlLoop()
 		break;
 	}
 	
-
-    	
- 
-
-      return true;
+    return true;
 }
 
-	bool Turtlebot3Supervisor::breakoutPossible_ = true;
-    bool Turtlebot3Supervisor::timerStarted_ = false;
+
+bool Turtlebot3Supervisor::breakoutPossible_ = true;
+bool Turtlebot3Supervisor::timerStarted_ = false;
 
 /*******************************************************************************
 * Main function
@@ -896,7 +798,6 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "turtlebot3_supervisor");
   Turtlebot3Supervisor turtlebot3_supervisor;
   ros::Rate loop_rate(125);
-
 
   while (ros::ok())
   {

@@ -77,9 +77,14 @@ TeleopTwistJoy::TeleopTwistJoy(ros::NodeHandle* nh, ros::NodeHandle* nh_param)
 {
   pimpl_ = new Impl;
 
+  //We publish not directly to the robot
   pimpl_->cmd_vel_pub = nh->advertise<geometry_msgs::Twist>("cmd_vel2", 1, true);
+
   pimpl_->joy_sub = nh->subscribe<sensor_msgs::Joy>("joy", 1, &TeleopTwistJoy::Impl::joyCallback, pimpl_);
+
+  //We subsribe to the superCmd message to get velocity limits from supervisor
   pimpl_->super_sub = nh->subscribe<turtlebot3_master::Super>("super_cmd", 1, &TeleopTwistJoy::Impl::superCallback, pimpl_);
+
   pimpl_->feedback_pub_ = nh->advertise<sensor_msgs::JoyFeedbackArray>("/joy/set_feedback", 5);
 
   nh_param->param<int>("enable_button", pimpl_->enable_button, 0);
@@ -161,7 +166,7 @@ void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_m
   cmd_vel_msg.angular.y = getVal(joy_msg, axis_angular_map, scale_angular_map[which_map], "pitch");
   cmd_vel_msg.angular.x = getVal(joy_msg, axis_angular_map, scale_angular_map[which_map], "roll");
   
-
+  //Velocity Limits are enforced
   if(cmd_vel_msg.linear.x > linearVelLimit)
   {
     cmd_vel_msg.linear.x = linearVelLimit;
@@ -185,16 +190,6 @@ void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_m
   cmd_vel_pub.publish(cmd_vel_msg);
   sent_disable_msg = false;
 
-		/*sensor_msgs::JoyFeedbackArray feedback_array;
-  		sensor_msgs::JoyFeedbackPtr feedback(new sensor_msgs::JoyFeedback());
-        feedback->type = sensor_msgs::JoyFeedback::TYPE_RUMBLE;
-		feedback->id = 0;
-		feedback->intensity = 1.0;
-        feedback_array.array.push_back(*feedback);
-		feedback->id = 1;
-		feedback->intensity = 1.0;
-        feedback_array.array.push_back(*feedback);
-		feedback_pub_.publish(feedback_array);*/
 }
 
 void TeleopTwistJoy::Impl::joyCallback(const sensor_msgs::Joy::ConstPtr& joy_msg)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+#import libraries
 import rospy
 from PIL import Image
 import cv2 
@@ -13,13 +13,12 @@ matplotlib.use('Agg')
 from matplotlib import pyplot
 import threading
 from math import cos, sin, pi
-from sensor_msgs.msg import LaserScan # LaserScan type message is defined in sensor_msgs
-from geometry_msgs.msg import Twist #
+from sensor_msgs.msg import LaserScan 
+from geometry_msgs.msg import Twist 
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from std_msgs.msg import String,Int32,Int32MultiArray,MultiArrayLayout,MultiArrayDimension
 from turtlebot3_master.msg import ScanData
-#from pyquaternion import Quaternion
 
 positionx = None
 positiony = None
@@ -40,29 +39,21 @@ assumedy = list(range(0, 360))
 
 def callback1(dt):   
 
-    #print '-------------------------------------------'
-    #print 'Closest obstacle:   {}'.format(min(dt.ranges))
-    #print 'Range data at 15 deg:  {}'.format(dt.ranges[15])
-    #print 'Range data at 345 deg: {}'.format(dt.ranges[345])
-    #print '-------------------------------------------'
+   
     global closestObstacle
     global closestObtacleAngle
     global arrayOfObstacles
     global assumedx
     global assumedy
     global start
-    global alreadyClicked  
-    #alreadyClicked = 0
-    #print start, alreadyClicked
-    #print(dt.ranges , len(dt.ranges))
+    global alreadyClicked    
     closestObstacle = min(dt.ranges)
-    #print("90 odleglosc",dt.ranges[90])
-   # #print ("90 odleglooosc",dt.ranges[dt.ranges[90]] * 20)
+  	#Looking for the smallest distance 
     closestObtacleAngle = dt.ranges.index(min(dt.ranges))
     t0 = +2.0 * (wq * xq + yq * zq)
     t1 = +1.0 - 2.0 * (xq * xq + yq* yq)
     roll_x = math.atan2(t0, t1)
-     
+    #Transformation from Quaternion to Euler angles 
     t2 = +2.0 * (wq * yq - zq * xq)
     t2 = +1.0 if t2 > +1.0 else t2
     t2 = -1.0 if t2 < -1.0 else t2
@@ -71,67 +62,27 @@ def callback1(dt):
     t3 = +2.0 * (wq * zq + xq * yq)
     t4 = +1.0 - 2.0 * (yq * yq + zq * zq)
     yaw_z = math.atan2(t3, t4)
-    changedToAngles = (180 * yaw_z)/(math.pi) 
-    #print("angle" , yaw_z, changedToAngles)
+    changedToAngles = (180 * yaw_z)/(math.pi)    
     x = (407/2) + -(1) * ((407 - 0) / (10 - (-10)))
 
     for distance in range(len(dt.ranges)):
-    	#print (distance , start)
+    	#We iterate through every element from the ranges array and transform values to find the assumed x and y position for all of the obstacles
     	arrayOfObstacles[distance] = dt.ranges[distance]
-    	#print rotationz
-    	#if (rotationz > 0.995 or rotationz < -0.995):    		
-    		#if(start == False and alreadyClicked == 0):
-    			#start = True
-    			#alreadyClicked = 1
-
-    		#if(start == True and alreadyClicked == 0):
-    			#start = False
-    			#alreadyClicked = 1
-
-
-    	#if start == False:    	
-    	angle = (math.radians(360 - distance - changedToAngles))
-    	#if start == True: 
-    		#angle = (math.radians(360 - distance + (140 * 0.5)))
-    	 	
-    	#print ("kat",angle)
+    	#Calculating the angle under which the obstacles lies , taking in consideration both - rotation and scanner angle   	
+    	angle = (math.radians(360 - distance - changedToAngles))  	
     	radius = dt.ranges[distance] * 20
-    	#print start
-    	#print (distance,dt.ranges[70])
-    	#print (radius)
+    	#calculating the assumed x and y for the obstacles  	
     	x = J11 + (radius * cos(angle))
     	y = J22 + (radius * sin(angle))      	
     	assumedx[distance] = x
     	assumedy[distance] = y
-    	#print start
-    	#print("odleglosc", radius)
-    	#arrayOfObstacles[distance] = dt.ranges[distance]
-    #print(closestObstacle)
-    #closestObstacle = (383.5/2) + -(closestObstacle) * ((383.5 - 0) / (10 - (-10)))
-    #print(closestObstacle , closestObtacleAngle)
-    #print(arrayOfObstacles[4] , dt.ranges[4])
-
-    #print("dlugosc",len(assumedx), assumedx , arrayOfObstacles)
-    #assumedx = []
-    #assumedy = []
-    #arrayOfObstacles = []
+    #Cleaning the arrays    	
     if(len(arrayOfObstacles) > 360):
     	arrayOfObstacles = []
     	assumedx =[]
     	assumedy =[]
 
-def changeTozero():
-	global alreadyClicked
-	#print alreadyClicked
-	alreadyClicked = 0
-	print(threading.active_count())
-	Timer(0.5, changeTozero).start()
-
-
-
-def callback(msg):
-	#print(msg.pose.pose.position.x)
-	#print(msg.pose.pose.position.y)	
+def callback(msg):	
 	global positionx
 	global positiony
 	global zq
@@ -140,164 +91,67 @@ def callback(msg):
 	global yq
 	positionx =  msg.pose.pose.position.x
 	positiony =  msg.pose.pose.position.y
-   
-
-    
-
 	global J11
 	global J22
-
-
+	#Calculating the current position of the robot
 	J11 = (407/2) + -(positionx) * ((407 - 0) / (10 - (-10)))
 	J11 = 407 - J11 
-
 	J22 = (407/2) + -(positiony) * ((407 -  0 )/ (10 - (-10)))
+	#Getting the current orientation of the robot 
 	zq =  msg.pose.pose.orientation.z
 	wq =  msg.pose.pose.orientation.w
 	yq =  msg.pose.pose.orientation.y
-	xq =  msg.pose.pose.orientation.x
-	#print (xq , yq , zq ,wq )
-	#print msg.pose.pose.orientation.z
-	#print(J11 , J22)
+	xq =  msg.pose.pose.orientation.x	
 	return J11 , J22 
 
 def cutCirle():
-	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
+	#Opening the map
 	matrix = cv2.imread("/home/harumanager/catkin_ws/src/maps/supermap1.pgm", cv2.IMREAD_COLOR)
-	#print("zaczynam")	
-	#pp.imshow(matrix)
-	#pp.show()
+	#Cutting the picture
 	matrix = matrix[200:607, 0:407]
-	#pp.imshow(matrix)
-	#pp.show()
-	#pp.close("all")
-	mask = sector_mask(matrix.shape,(J22,J11,),71.225,(0,360))
-	matrix[~mask] = 125
-	n = np.array(matrix)
-	number_of_white_pix = np.sum(matrix== 254)
-	number_of_black_pix = np.sum(matrix == [0,0,0])
-	obstacleType = None
-	obstacleDistance =  closestObstacle
-	obstacleAngle = closestObtacleAngle
-
-	#print('Number of white pixels:', number_of_white_pix)
-	#print('Number of black pixels:', number_of_black_pix)
+	#Displaying the robot cooridnates
 	newCoorinatex = int(J22)
 	newCoorinatey = int(J11)
 	matrix[newCoorinatex,newCoorinatey] = [254 , 50 ,50]
-	matrix[199,151] = [254 , 50 ,50]
-	#pp.imshow(matrix)
-	#pp.show()
-	#pp.close("all")
+	#Applying the mask
+	mask = sector_mask(matrix.shape,(J22,J11,),71.225,(0,360))
+	matrix[~mask] = 125
+	n = np.array(matrix)
+	#Getting the number of white and black pixels
+	number_of_white_pix = np.sum(matrix== 254)
+	number_of_black_pix = np.sum(matrix == [0,0,0])
+	obstacleType = None	
 	disntance_array = []
 	angle_array = []
-	if(number_of_black_pix > 0):
-		#print('There is an obstacle')
-		ycoords, xcoords = np.where((n[:, :, 0:3] == [0,0,0]).all(2))
-		#xcoords = (383.5/2) + -(xcoords) * ((383.5 - 0) / (10 - (-10)))
-		#xcoords = 383.5 - xcoords
-		#J22 = (383.5/2) + -(ycoords) * ((383.5 -  0 )/ (10 - (-10)))
-		#print(xcoords)
-		#print(ycoords)
-		#print (xcoords[3])
-		sizeArray = len(xcoords)
-		for x in range(sizeArray):
-			#for y in ycoords:
-				#print (x)
-					#print(x , y)
-					#matrix[xcoords,ycoords] = [254,0,0]
-					#matrix[startingx+up,startingy] = [60,60,60]
-					#number_of_green_pix = np.sum(matrix == [60,60,60])
-					#print('Number of green pixels:', number_of_green_pix)
-					#254, 0, 0 = im.getpixel(134,179) 
-				
-				#print("J11",J11)
-				#x = (10/2) + -(x) * ((10 - (-10)) / (383.5))
-				#x = 383.5 - x
-				#y = (383.5/2) + -(y) * ((383.5 -  0 )/ (10 - (-10)))
-				#print("x" , xcoords[x])
-				#print("J22",J22)
-
-			#print("Y" , ycoords[x])
-			#print( "wspolrzedne" , J11 , J22)
-
-			
-			
-
-			distance =  math.sqrt(((J22 - ycoords[x])**2) + ((J11 - xcoords[x])**2))
-			distance = distance / 20.35			
-			dx =   J11
-			dy =   J22
-			p1 = (J11 , J22)
-			p2 = (xcoords[x], ycoords[x])
-			#myradians = math.atan2(J11,J22)
-			#myradians2 = math.atan2(xcoords[x],ycoords[x])
-			#myradians = math.degrees(myradians)
-			#myradians = math.degrees(myradians2)
-			#mydegrees = myradians2 - myradians2
-			ang1 = np.arctan2(*p1[::-1])
-			ang2 = np.arctan2(*p2[::-1])
-			mydegrees = np.rad2deg((ang1 - ang2) % (2 * np.pi))
-			mydegrees %= 360 
-
-			#distance = (20/2) + -(distance) * ((10 - (-10)) / (383.5))	
-			disntance_array.append(distance)
-			#myradians = math.atan2(J22 - ycoords[x], J11 - xcoords[x])
-			#mydegrees = math.degrees(myradians)
-			#angle = math.atan2(dy, dx) * 180 / 3.14
-			#mydegrees %= 360 
-
-
-			angle_array.append(mydegrees)
-							
-			#distance = (20/2) + -(distance) * ((10 - (-10)) / (383.5))
-			#print( " new x" ,x)
-		#print("odleglosci" , disntance_array)
-		#print("katy" , angle_array)
-
-		przewidywana_odleglosc =  math.atan2(12 - 14 ,0 - 0 )
-		przewidywana_odleglosc = math.degrees(przewidywana_odleglosc)
-		#print("Moze" ,przewidywana_odleglosc)
-
-		smallest_distance = min(disntance_array)
-		mallest_angle_index = disntance_array.index(min(disntance_array))
-		angle_of_the_smallest_distance = angle_array[mallest_angle_index]		
-		#print("distance" ,smallest_distance , mallest_angle_index , len(disntance_array) , len(angle_array), xcoords[mallest_angle_index] , ycoords[mallest_angle_index] , angle_of_the_smallest_distance)
-		x_on_map = xcoords[mallest_angle_index] 
-		y_on_map = ycoords[mallest_angle_index]
-
-		del disntance_array
-		del angle_array
-		#assumedx,assumedy  = point_on_circle2()
-		#print("nasz assumed x", assumedx)
-		obstacleTypeArray = []		
+	#Assigning the coordinates of the black pixels to the array
+	if(number_of_black_pix > 0):		
+		ycoords, xcoords = np.where((n[:, :, 0:3] == [0,0,0]).all(2))		
+		sizeArray = len(xcoords)		
+		obstacleTypeArray = []
+		#Iterating through all 360 values from scanner reading 	
 		for values in range(360):
 			obstacleType = None			
 			for xy in range(len(xcoords)):
+				#If value is infinitive - there are no obstacles
 				if(math.isinf(arrayOfObstacles[values]) == True):
 					obstacleType = 2
 					obstacleTypeArray.append(obstacleType)
-					break
-				#print(xy , len(xcoords))
+					break	
 
-				
-
-			#print('value' , x)
-			##x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05)
+				#Checking if the assumed value lies within 3% error margin as the black pixel values from the cutted piece of map
 				if (assumedx[values] - (assumedx[values] * 0.03) <= xcoords[xy] <= assumedx[values] + (assumedx[values] * 0.03)):
 					indexxy = xy
-					#print(indexxy , xcoords[xy] , x )				
+					#Checking the same condition for y coorrdinate		
 					if (assumedy[values] - (assumedy[values] * 0.03)<= ycoords[indexxy] <= assumedy[values] + (assumedy[values] * 0.03)):
-						#print("obstacle in both map and simulation", values ,xcoords[xy] ,assumedx[values] , ycoords[xy] , assumedy[values] )
+						#Obstacle exists both on the map and simulation 
 						obstacleType = 1
 						obstacleTypeArray.append(obstacleType)
 						break
 
-						#obstacleType = 1
+					#Obstacle doesnt exist on the map
 					else:
-						if(xy == len(xcoords)-1):
-						
-							#print ("changing to 0.1")
+						if(xy == len(xcoords)-1):					
+							
 							obstacleType = 0 
 							obstacleTypeArray.append(obstacleType)
 																  
@@ -305,113 +159,46 @@ def cutCirle():
 					
 									
 				else:
-					if(xy == len(xcoords)-1):
-					
-						#print ("changing to 0")
+					if(xy == len(xcoords)-1):					
 						obstacleType = 0 
 						obstacleTypeArray.append(obstacleType)
 						
 
 					
-		#if(x_on_map + x_on_map * 0.005) >= x or x_on_map - (x_on_map* 0.005) <= x and y_on_map + (y_on_map * 0.005) >= y or y_on_map - (y_on_map * 0.005) <= y :
-		#if x_on_map - (x_on_map * 0.05) <= x <=  x_on_map + (x_on_map * 0.05) and y_on_map - (y_on_map * 0.05) <= y <=  y_on_map + (y_on_map * 0.05) :
-			#print("within a margin" ,x_on_map , x )
-			#obstacleType = 1
-		#else:
-			#print("not within margin")
-			#obstacleType = 0
+	#There are no obstacles on the map	
 	else:
-		if (math.isinf(closestObstacle) == True ):
-			#print("There is no obstacles")
+		if (math.isinf(closestObstacle) == True ):			
 			obstacleType = 2
 
-		elif (math.isinf(closestObstacle) == False):
-			#print ("There is obstacle only in simulator")
+		elif (math.isinf(closestObstacle) == False):			
 			obstacleType = 0 
 
 
-	#rrayOfObstacles = arrayOfObstacles[:len(arrayOfObstacles)-360]
-
-	#print("wektor typow", len(obstacleTypeArray), obstacleTypeArray)
-	AnglesObstacles = list(range(1, 360))
-	#print("obstacle",arrayOfObstacles[5])
-	#print("dlugosc" , len(assumedx))
-
-	rate = rospy.Rate(10)
-	obstacleType1 = [5,5,5]
-	#array = [1, 1, 1]
-	#print(obstacleTypeArray[10],arrayOfObstacles[10])
-	#print("x",assumedx[10])
-	#print("y",assumedy[10])
-	#assx = int(assumedx[10])
-	#assy = int(assumedy[10])
-
-	#matrix[assx,assy] = [60 , 254 ,50]
-	#matrix[assy,assx] = [60 , 254 ,50]
-	#pp.imshow(matrix)
-	#pp.show()
-	array = [1, 1 , 1]
-	#my_array_for_publishing = Int32MultiArray(data=array)	
+	AnglesObstacles = list(range(1, 360))	
+	rate = rospy.Rate(10)	
+	#Publishing the message
 	scanDataMsg = ScanData()
 	scanDataMsg.angles = AnglesObstacles
 	scanDataMsg.ranges = arrayOfObstacles
-	scanDataMsg.type = obstacleTypeArray
-	#hello_str = obstacleType
-	#rospy.loginfo(scanDataMsg)
-	pub.publish(scanDataMsg)
-	#print("HAAAAAAAAAAAAAAALLLLLLLLLLLOOOOOOOOOOOOOOOOOO")
-
-	#del arrayOfObstacles
-	#arrayOfObstacles = []
-
-
-
+	scanDataMsg.type = obstacleTypeArray	
+	pub.publish(scanDataMsg)	
 	Timer(0.01, cutCirle).start()
 
-	#return obstacleType
-	#pp.close()
-
-
-def point_on_circle():
-    '''
-        Finding the x,y coordinates on circle, based on given angle
-    '''
+def point_on_circle():   
     
     #center of circle, angle in degree and radius of circle
     center = [J22, J11]
-
     angle = (math.radians(closestObtacleAngle - 90))
     radius = closestObstacle * 20.35
-    #print("radius" ,radius)
     x = J11 + (radius * cos(angle))
     y = J22 + (radius * sin(angle))
-    #print("czy sie zgadzaja ",x,y)
-    #print(arrayOfObstacles[4])
+   
 
     return x,y
 
-def point_on_circle2():
-	assumedx = []
-	assumedy = []
-	center = [J22, J11]	
-
-	for xy in range(360):
-		#print(xy)
-		angle = (math.radians(xy - 90))		
-    	radius = arrayOfObstacles[xy] * 20.35
-    	#print("new radius " , arrayOfObstacles[xy])    	
-    	x = J11 + (radius * cos(angle))
-    	#print("nowe x" , x)
-    	y = J22 + (radius * sin(angle))    	
-    	assumedx.append(J11 + (arrayOfObstacles[xy]*20.35 * cos(angle)))
-    	assumedy.append(J22 + (arrayOfObstacles[xy]*20.35 * sin(angle)))
-
-	#print("nasz assumed x dlufi" ,assumedx ,assumedx[5])
-	return assumedx , assumedy
-
 def sector_mask(shape,centre,radius,angle_range):
     
-
+	#Cutting the piece of map - which resambles the scanner range 
     x,y = np.ogrid[:shape[0],:shape[1]]
     cx,cy = centre
     tmin,tmax = np.deg2rad(angle_range)    
@@ -422,18 +209,7 @@ def sector_mask(shape,centre,radius,angle_range):
     theta %= (2*np.pi)   
     circmask = r2 <= radius*radius   
     anglemask = theta <= (tmax-tmin)
-
     return circmask*anglemask
-
-def NewCoordinates(newx, newy):
-	J11 = (383.5/2) + -(newx) * ((383.5 - 0) / (10 - (-10)))
-	J11 = 383.5 - J11
-	J22 = (383.5/2) + -(newy) * ((383.5 -  0 )/ (10 - (-10)))
-
-
-	return J11 , J22
-
-
 
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
@@ -445,8 +221,6 @@ def talker():
         pub.publish(hello_str)
         rate.sleep()
 
-
-
 if __name__ == '__main__':
 	#start = False
 	rospy.init_node('ObstacleType')
@@ -455,68 +229,7 @@ if __name__ == '__main__':
 	sub = rospy.Subscriber("/scan", LaserScan, callback1)		
 	startingx = 280
 	startingy = 290	
-	#J11 = (383/2) + -(4) * ((383 - 0) / (10 - (-10)))
-	#J11 = 383 - J11
-	#J22 = (383/2) + -(-2) * ((383 -  0 )/ (10 - (-10)))
-	#print(J11 , J22)
-	#X = [[J11, 0], 
-    #[0, J22]]
-	#print("A =", X[1][1])
-	#Y = [[-2], [0.4]]
-	#print(Y)
-	#result = [[0], [0]]
-	#for i in range(len(X)):   	
-		#for j in range(len(Y[0])):
-			#for k in range(len(Y)):
-				#result[i][j] += X[i][k] * Y[k][j]
-
-	#for r in result:
-		#print(r)
-
-	#matrix = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	#matrix1 = cv2.imread("/home/harumanager/map.pgm", cv2.IMREAD_COLOR)
-	#print(positionx , positiony)
-	#newx, newy = NewCoordinates(positionx, positiony)
-	#print("NewCoordinates" , newx, newy)
-	#print(J11)
-
-
-
-
-
-	#pp.imshow(matrix)
-	#pp.show()
-	#mask = sector_mask(matrix.shape,(0,0,),40,(0,360))
-	#matrix[~mask] = 125
-	#pp.imshow(mask)
-	#pp.show()
-	#number_of_white_pix = np.sum(matrix== 254)
-	#number_of_black_pix = np.sum(matrix == [0,0,0])
-	#newx, newy = NewCoordinates(positionx, positiony)
-	#print("NewCoordinates" , newx, newy)
-	#mask = sector_mask(matrix.shape,(newy,newx,),40,(0,360))
-	#matrix[~mask] = 125
-	#pp.imshow(mask)
-	#pp.show()
-
-
-	#print("positionx", positionx)
-	cutCirle()
-	changeTozero()
-	#a = IntList()
-	#a.data = [typeOfObstacle,distance,angle]
-	point_on_circle()
-	#print("type",obstacleType)
-	#del assumedx
-	#del assumedy
-	#del arrayOfObstacles
-	
-	
-	#pub = rospy.Publisher('obstacleType', distance , angle , typeOfObstacle)
-	#rospy.init_node('talker_obstacle')
-	#ros::NodeHandle nh
-	#ros::Publisher pub=nh.advertise<geometry_msgs::Twist>("obstacleType/cmd_vel", 100)
+	cutCirle()	
+	point_on_circle()	
 	rospy.spin()
-	#pp.imshow(matrix)	
-	#pp.show()
-	#rospy.spin() 
+	
